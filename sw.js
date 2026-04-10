@@ -1,6 +1,6 @@
 const CACHE_NAME = 'emergencias-cache-v3'; 
 const urlsToCache = [
-  './INDEX.HTML',
+  './index.html',
   './manifest.json',
   './mochila.jpg',
   './rcp-adultos.jpg',
