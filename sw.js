@@ -1,13 +1,13 @@
-const CACHE_NAME = 'emergencias-cache-v2'; // Cambiamos a v2 para forzar la actualización
+const CACHE_NAME = 'emergencias-cache-v3'; 
 const urlsToCache = [
   './INDEX.HTML',
+  './manifest.json',
   './mochila.jpg',
   './rcp-adultos.jpg',
   './rcp-ninos.jpg',
   './rcp-bebes.jpg',
   './atragantamiento-adultos-ninos.jpg',
-  './atragantamiento-bebes.jpg',
-  './manifest.json'
+  './atragantamiento-bebes.jpg'
 ];
 
 self.addEventListener('install', event => {
