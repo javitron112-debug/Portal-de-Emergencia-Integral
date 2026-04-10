@@ -1,15 +1,15 @@
-const CACHE_NAME = 'emergencias-cache-v1';
+const CACHE_NAME = 'emergencias-cache-v2'; // Cambiamos a v2 para forzar la actualización
 const urlsToCache = [
   './INDEX.HTML',
   './mochila.jpg',
-  './rcp adultos.jpg',
-  './rcp niños.jpg',
-  './rcp bebes.jpg',
-  './atragantamiento adultos y niños.jpg',
-  './atragantamiento bebes.jpg'
+  './rcp-adultos.jpg',
+  './rcp-ninos.jpg',
+  './rcp-bebes.jpg',
+  './atragantamiento-adultos-ninos.jpg',
+  './atragantamiento-bebes.jpg',
+  './manifest.json'
 ];
 
-// Instalar el Service Worker y guardar archivos en caché
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -20,12 +20,10 @@ self.addEventListener('install', event => {
   );
 });
 
-// Interceptar las peticiones de red y servir desde la caché si no hay internet
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Devuelve el archivo de la caché si existe, si no, lo busca en la red
         return response || fetch(event.request);
       })
   );
