@@ -994,21 +994,29 @@
         }
 
         function consultarOverpass(lat, lon) {
+            // Optimización EXTREMA: Solo buscamos nodos (node) y líneas (way).
+            // El uso del punto '.' en "Protecci.n" actúa como comodín ultrarrápido para "ó" u "o".
             const query = `
-                [out:json][timeout:15];
+                [out:json][timeout:25];
                 (
-                  nwr(around:5000,${lat},${lon})["amenity"="police"];
-                  nwr(around:5000,${lat},${lon})["amenity"="fire_station"];
-                  nwr(around:5000,${lat},${lon})["name"~"Cruz Roja|Protección Civil|Proteccion Civil",i];
+                  node["amenity"="police"](around:5000,${lat},${lon});
+                  way["amenity"="police"](around:5000,${lat},${lon});
+                  
+                  node["amenity"="fire_station"](around:5000,${lat},${lon});
+                  way["amenity"="fire_station"](around:5000,${lat},${lon});
+                  
+                  node["name"~"Cruz Roja|Protecci.n Civil",i](around:5000,${lat},${lon});
+                  way["name"~"Cruz Roja|Protecci.n Civil",i](around:5000,${lat},${lon});
                 );
                 out center;
             `;
 
+            // Servidores actualizados (Eliminamos el .ru que da Timeout y añadimos el suizo .ch)
             const endpoints = [
-                "https://overpass-api.de/api/interpreter",
-                "https://lz4.overpass-api.de/api/interpreter",
-                "https://overpass.kumi.systems/api/interpreter",
-                "https://overpass.openstreetmap.ru/api/interpreter"
+                "https://overpass-api.de/api/interpreter",         // Principal Alemán
+                "https://overpass.osm.ch/api/interpreter",         // Suizo (Muy rápido)
+                "https://overpass.kumi.systems/api/interpreter",   // Taiwán (Estable)
+                "https://lz4.overpass-api.de/api/interpreter"      // Secundario Alemán
             ];
 
             let currentEndpoint = 0;
@@ -1016,7 +1024,7 @@
             function fetchWithFallback() {
                 if (currentEndpoint >= endpoints.length) {
                     document.getElementById('loading').style.display = 'none';
-                    alert("Aviso: Todos los servidores públicos de mapas están saturados. Por favor, inténtalo de nuevo en unos minutos.");
+                    alert("Aviso: Todos los servidores públicos de mapas están saturados en este momento. Por favor, inténtalo de nuevo en unos minutos.");
                     return;
                 }
 
