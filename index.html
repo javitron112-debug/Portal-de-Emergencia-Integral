@@ -810,7 +810,7 @@
                 document.getElementById('nav-paux').classList.add('active-nav');
             }
 
-            // Recarga del mapa para que se visualice correctamente
+            // Recarga obligatoria del mapa para evitar fallos de renderizado al mostrar su pestaña
             if (sectionId === 'mapa' && map) {
                 setTimeout(() => {
                     map.invalidateSize();
@@ -911,7 +911,7 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // --- 4. LÓGICA DEL MAPA TÁCTICO (LEAFLET + OVERPASS) ---
+        // --- 4. LÓGICA DEL MAPA TÁCTICO (LEAFLET + OVERPASS + FALLBACK) ---
         let map;
         let markersGroup;
         let resultadosGlobales = []; 
@@ -1009,18 +1009,42 @@
                 out center;
             `;
 
-            const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+            const encodedQuery = encodeURIComponent(query);
+            
+            // Sistema de redundancia: 3 servidores distintos de mapas por si uno se cae (Evita el error 504)
+            const endpoints = [
+                `https://overpass-api.de/api/interpreter?data=${encodedQuery}`,
+                `https://lz4.overpass-api.de/api/interpreter?data=${encodedQuery}`,
+                `https://overpass.kumi.systems/api/interpreter?data=${encodedQuery}`
+            ];
 
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    procesarResultados(data.elements, lat, lon);
-                })
-                .catch(error => {
+            let currentEndpoint = 0;
+
+            function fetchWithFallback() {
+                if (currentEndpoint >= endpoints.length) {
                     document.getElementById('loading').style.display = 'none';
-                    alert("Error al conectar con la base de datos táctica de OpenStreetMap.");
-                    console.error(error);
-                });
+                    alert("Aviso: Todos los servidores públicos de mapas están saturados en este momento. Por favor, inténtalo de nuevo en unos minutos.");
+                    return;
+                }
+
+                fetch(endpoints[currentEndpoint])
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Servidor saturado (Error ${response.status})`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        procesarResultados(data.elements, lat, lon);
+                    })
+                    .catch(error => {
+                        console.warn(`El servidor ${endpoints[currentEndpoint]} ha fallado. Saltando al siguiente servidor de emergencia...`, error);
+                        currentEndpoint++; 
+                        fetchWithFallback(); 
+                    });
+            }
+
+            fetchWithFallback();
         }
 
         function procesarResultados(elementos, userLat, userLon) {
@@ -1047,7 +1071,7 @@
                     ? `${el.tags["addr:street"]} ${el.tags["addr:housenumber"] || ''}` 
                     : "Dirección exacta no registrada";
                 
-                const googleMapsUrl = `http://googleusercontent.com/maps.google.com/8{elLat},${elLon}`;
+                const googleMapsUrl = `http://googleusercontent.com/maps.google.com/9{elLat},${elLon}`;
 
                 resultadosGlobales.push(`TIPO: ${tipo}\nNOMBRE: ${nombre}\nDIRECCIÓN: ${direccion}\nCOORDENADAS: ${elLat}, ${elLon}\nENLACE GPS: ${googleMapsUrl}\n------------------------\n`);
 
