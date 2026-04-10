@@ -3,101 +3,167 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manual Táctico de Emergencias v5.0</title>
+    <title>Manual Integrado de Emergencias: Preparación, Radio, P. Auxilios y Mapa</title>
     
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#d32f2f">
     
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
     <style>
         :root {
-            --primary: #d32f2f;
-            --secondary: #1976d2;
-            --dark: #1a1a1a;
-            --light: #f4f6f8;
+            --primary-color: #d32f2f;
+            --secondary-color: #1976d2;
+            --accent-color: #f57c00;
+            --dark-color: #1a1a1a;
+            --light-bg: #f4f6f8;
             --white: #ffffff;
-            --alert: #ffeb3b;
+            --text-color: #333333;
+            --alert-bg: #ffeb3b;
+            --alert-text: #000000;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            line-height: 1.6; margin: 0; padding: 0;
-            background-color: var(--light); color: #333;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--text-color);
         }
 
-        /* Estructura SPA */
+        /* SPA Logic */
         .page-section { display: none; animation: fadeIn 0.3s; }
         .page-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* Navegación */
+        /* Navbar */
         .navbar {
-            display: flex; justify-content: center; flex-wrap: wrap;
-            background-color: var(--dark); padding: 0.8rem;
-            position: sticky; top: 0; z-index: 1000;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            background-color: var(--dark-color);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
+
         .navbar button {
             background: none; border: none; color: white;
-            padding: 0.6rem 1rem; font-weight: bold; cursor: pointer;
+            padding: 0.5rem 1rem; font-weight: bold;
+            font-size: 0.95rem; cursor: pointer; transition: color 0.3s;
         }
-        .navbar button.active-nav { color: var(--primary); border-bottom: 2px solid var(--primary); }
 
-        .container { max-width: 800px; margin: 1rem auto; padding: 0 1rem; }
-        .card { background: var(--white); border-radius: 8px; padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        header { background-color: var(--primary); color: white; padding: 1.5rem; text-align: center; }
-        h1 { margin: 0; font-size: 1.8rem; }
-        h2 { color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 0.5rem; margin-top: 0; }
+        .navbar button:hover, .navbar button.active-nav { color: var(--primary-color); }
 
-        /* Estilos del Mapa */
-        #map { height: 350px; width: 100%; border-radius: 8px; border: 2px solid #ddd; margin: 1rem 0; z-index: 1; }
-        .search-bar { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
-        .search-input { flex: 1; padding: 0.8rem; border: 1px solid #ccc; border-radius: 4px; }
-        .btn { background: var(--secondary); color: white; border: none; padding: 0.8rem 1.2rem; border-radius: 4px; font-weight: bold; cursor: pointer; width: 100%; }
-        .btn-search { width: auto; }
+        .alert-banner {
+            background-color: var(--alert-bg); color: var(--alert-text);
+            text-align: center; padding: 1rem; font-weight: bold;
+            font-size: 1.1rem; border-bottom: 3px solid #fbc02d;
+        }
+
+        header { background-color: var(--primary-color); color: var(--white); padding: 2rem 1rem; text-align: center; }
+        header h1 { margin: 0; font-size: 2.2rem; }
+
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+
+        .card { background: var(--white); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+        h2 { color: var(--primary-color); border-bottom: 2px solid #ddd; padding-bottom: 0.5rem; margin-top: 0; }
+
+        /* Portal Cards */
+        .portal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
+        .portal-card {
+            background-color: #fff; padding: 2rem; border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;
+            border: 2px solid transparent; transition: border-color 0.3s, transform 0.3s;
+            cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;
+        }
+        .portal-card:hover { border-color: var(--secondary-color); transform: translateY(-5px); }
+        .portal-card .icon { font-size: 3.5rem; margin-bottom: 1rem; }
+        
+        .btn {
+            background-color: var(--secondary-color); color: white;
+            padding: 1rem; border-radius: 4px; margin-top: 1rem;
+            font-weight: bold; border: none; cursor: pointer; width: 100%;
+        }
+
+        /* Mochila Styles */
+        progress { width: 100%; height: 20px; accent-color: #2e7d32; }
+        .progress-container {
+            background: var(--white); padding: 1rem; border-radius: 8px;
+            margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center; position: sticky; top: 60px; z-index: 100;
+        }
+        .category h2 { background-color: var(--secondary-color); color: white; padding: 1rem; border-radius: 8px 8px 0 0; margin: -1.5rem -1.5rem 1.5rem -1.5rem; }
+        .item-list { list-style: none; padding: 0; margin: 0; }
+        .item { display: flex; align-items: flex-start; padding: 1rem; border-bottom: 1px solid #ddd; }
+        .item.checked { background-color: #f1f8e9; }
+        .item.checked span { text-decoration: line-through; color: #6c757d; }
+        input[type="checkbox"] { margin-top: 0.3rem; margin-right: 1rem; width: 20px; height: 20px; }
+        .item-title { font-weight: 600; display: block; }
+        .item-desc { font-size: 0.85rem; color: #666; }
+        .reset-btn { background-color: #e0e0e0; color: var(--text-color); }
+        
+        /* Map Styles */
+        #map { height: 400px; width: 100%; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 1rem; z-index: 1; }
+        .search-bar { display: flex; gap: 0.5rem; width: 100%; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .search-input { flex: 1; min-width: 250px; padding: 0.8rem; border: 2px solid #ddd; border-radius: 4px; font-size: 1rem; }
+        .result-item { background-color: #f8f9fa; border-left: 4px solid var(--secondary-color); padding: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
         
         #loading-status { 
-            display: none; background: #e3f2fd; color: #0d47a1; 
-            padding: 0.8rem; border-radius: 4px; text-align: center; 
-            font-weight: bold; margin-bottom: 1rem; 
+            display: none; background: #fff3e0; border: 1px solid #ffe0b2;
+            padding: 1rem; border-radius: 4px; margin-bottom: 1rem;
+            font-weight: bold; color: #e65100; text-align: center;
         }
 
-        .result-item { 
-            background: #f9f9f9; border-left: 5px solid var(--secondary); 
-            padding: 1rem; margin-bottom: 0.8rem; border-radius: 4px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
+        .graphic-container { margin: 1.5rem 0; text-align: center; }
+        .graphic-container img { max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .baby-warning { background-color: #ffcccc; border: 2px solid var(--primary-color); padding: 1rem; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 1rem; }
+        .emergency-card { background-color: #fff9c4; border-left: 4px solid #fbc02d; padding: 1rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; }
+        .back-btn { background-color: #607d8b; margin-bottom: 1rem; width: auto; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 4px; cursor: pointer; font-weight: bold; display: inline-block;}
 
-        /* Imágenes y Gráficos */
-        .graphic { width: 100%; border-radius: 8px; margin: 1rem 0; }
-        .baby-warning { background: #ffebee; color: #b71c1c; padding: 1rem; border-radius: 8px; font-weight: bold; text-align: center; }
-
-        footer { text-align: center; padding: 2rem; color: #666; font-size: 0.9rem; }
+        footer { text-align: center; padding: 2rem; background-color: #ddd; color: var(--dark-color); margin-top: 2rem; }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
         <button onclick="navigate('inicio')" id="nav-inicio" class="active-nav">INICIO</button>
-        <button onclick="navigate('mochila')" id="nav-mochila">MOCHILA</button>
-        <button onclick="navigate('mapa')" id="nav-mapa">MAPA</button>
-        <button onclick="navigate('paux')" id="nav-paux">AUXILIOS</button>
+        <button onclick="navigate('mochila')" id="nav-mochila">MOCHILA 72H</button>
+        <button onclick="navigate('plan333')" id="nav-plan333">PLAN 333 RADIO</button>
+        <button onclick="navigate('mapa')" id="nav-mapa">MAPA TÁCTICO</button>
+        <button onclick="navigate('paux')" id="nav-paux">PRIMEROS AUXILIOS</button>
     </nav>
 
+    <div class="alert-banner">
+        ⚠️ ATENCIÓN: Si hay una emergencia AHORA, llama al <span class="number-112">112</span>.
+    </div>
+
     <section id="inicio" class="page-section active">
-        <header><h1>Portal de Emergencia</h1></header>
+        <header>
+            <h1>Portal de Emergencia Integral</h1>
+            <p>Preparación ciudadana, comunicaciones y primeros auxilios. 100% Offline tras instalar.</p>
+        </header>
         <main class="container">
-            <div class="card" onclick="navigate('mochila')" style="cursor:pointer">
-                <h2>🎒 Mochila de 72 Horas</h2>
-                <p>Lista de elementos vitales para aislamiento o evacuación.</p>
-            </div>
-            <div class="card" onclick="navigate('mapa')" style="cursor:pointer">
-                <h2>🗺️ Mapa de Recursos</h2>
-                <p>Busca policía y bomberos cercanos en modo preventivo.</p>
-            </div>
-            <div class="card" onclick="navigate('paux')" style="cursor:pointer">
-                <h2>🩹 Primeros Auxilios</h2>
-                <p>Protocolos de RCP y atragantamiento para todas las edades.</p>
+            <div class="portal-grid">
+                <div class="portal-card" onclick="navigate('mochila')">
+                    <div><div class="icon">🎒</div><h2>Mochila 72 Horas</h2><p>Checklist interactivo de supervivencia.</p></div>
+                    <button class="btn">VER CHECKLIST</button>
+                </div>
+                <div class="portal-card" onclick="navigate('plan333')">
+                    <div><div class="icon">📻</div><h2>Plan 333 (Radio)</h2><p>Protocolo de ahorro de batería.</p></div>
+                    <button class="btn" style="background-color: var(--accent-color);">VER PROTOCOLO</button>
+                </div>
+                <div class="portal-card" onclick="navigate('mapa')">
+                    <div><div class="icon">🗺️</div><h2>Mapa Táctico</h2><p>Buscador de recursos de emergencia.</p></div>
+                    <button class="btn" style="background-color: var(--dark-color);">ABRIR MAPA</button>
+                </div>
+                <div class="portal-card" onclick="navigate('paux')">
+                    <div><div class="icon">🩹</div><h2>Primeros Auxilios</h2><p>Protocolos RCP y Atragantamiento.</p></div>
+                    <button class="btn" style="background-color: var(--primary-color);">VER GUÍAS</button>
+                </div>
             </div>
         </main>
     </section>
@@ -105,43 +171,56 @@
     <section id="mochila" class="page-section">
         <header><h1>Mochila de 72 Horas</h1></header>
         <main class="container">
-            <div class="card">
-                <img src="mochila.jpg" class="graphic" alt="Mochila" onerror="this.style.display='none'">
-                <div id="progreso-container">
-                    <strong>Progreso: <span id="p-text">0%</span></strong>
-                    <progress id="p-bar" value="0" max="100" style="width:100%"></progress>
-                </div>
+            <div class="graphic-container"><img src="mochila.jpg" alt="Mochila" onerror="this.style.display='none'"></div>
+            <div class="progress-container"><h3>Progreso: <span id="progress-text">0%</span></h3><progress id="progress-bar" value="0" max="100"></progress></div>
+            
+            <div class="card category">
+                <h2>💧 1. Hidratación y Nutrición</h2>
+                <ul class="item-list">
+                    <li class="item"><input type="checkbox" id="m1"><label for="m1"><span class="item-title">Agua (3L min)</span><span>Botellas pequeñas.</span></label></li>
+                    <li class="item"><input type="checkbox" id="m2"><label for="m2"><span class="item-title">Potabilizadoras</span><span>Pastillas o filtro.</span></label></li>
+                    <li class="item"><input type="checkbox" id="m3"><label for="m3"><span class="item-title">Comida</span><span>Barritas, frutos secos, latas.</span></label></li>
+                </ul>
+            </div>
+            <button class="btn reset-btn" id="reset-btn">Limpiar lista</button>
+        </main>
+    </section>
+
+    <section id="plan333" class="page-section">
+        <header style="background-color: var(--accent-color);"><h1>Plan 333 Radio</h1></header>
+        <main class="container">
+            <div class="card status-panel-333">
+                <h2>Próxima Ventana</h2>
+                <div class="timer-333" id="countdown">Calculando...</div>
+                <p id="next-window-text">--:--</p>
             </div>
             <div class="card">
-                <div id="check-list">
-                    <label><input type="checkbox" class="m-check" id="c1"> Agua (3L por persona)</label><br>
-                    <label><input type="checkbox" class="m-check" id="c2"> Comida energética (barritas, frutos secos)</label><br>
-                    <label><input type="checkbox" class="m-check" id="c3"> Radio AM/FM a pilas</label><br>
-                    <label><input type="checkbox" class="m-check" id="c4"> Linterna y pilas de repuesto</label><br>
-                    <label><input type="checkbox" class="m-check" id="c5"> Botiquín básico</label><br>
-                    <label><input type="checkbox" class="m-check" id="c6"> Manta térmica</label>
-                </div>
+                <h2>La Regla 3-3-3</h2>
+                <p>Canal 3 | Cada 3 Horas | Durante 3 Minutos.</p>
             </div>
         </main>
     </section>
 
     <section id="mapa" class="page-section">
-        <header style="background: var(--dark)"><h1>Mapa Táctico</h1></header>
+        <header style="background-color: var(--dark-color);"><h1 style="color:white">Buscador de Emergencias</h1></header>
         <main class="container">
             <div class="card">
                 <div class="search-bar">
-                    <input type="text" id="dir-input" class="search-input" placeholder="Escribe tu calle o ciudad...">
-                    <button class="btn btn-search" onclick="buscarPorDireccion()">🔍</button>
+                    <input type="text" id="direccion-input" class="search-input" placeholder="Ciudad o dirección...">
+                    <button class="btn" style="width:auto" onclick="buscarPorDireccion()">🔍 Buscar</button>
                 </div>
-                <button class="btn" onclick="buscarCercanos()" style="background:#4caf50; margin-bottom: 1rem;">📍 Mi ubicación actual</button>
+                <button class="btn" onclick="buscarCercanos()">📍 Mi ubicación GPS</button>
                 
                 <div id="loading-status"></div>
+                
                 <div id="map"></div>
             </div>
-
             <div class="card">
-                <h2>Resultados</h2>
-                <div id="res-list">Inicia una búsqueda para localizar servicios.</div>
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <h2 style="margin:0">Resultados</h2>
+                    <button class="btn btn-danger" onclick="descargarResultados()" id="btn-download" style="display:none; max-width:200px">📥 TXT</button>
+                </div>
+                <div id="results-container"><p>Inicia una búsqueda para ver recursos en 5km.</p></div>
             </div>
         </main>
     </section>
@@ -149,166 +228,167 @@
     <section id="paux" class="page-section">
         <header><h1>Primeros Auxilios</h1></header>
         <main class="container">
-            <button class="btn" onclick="navigate('rcp')" style="margin-bottom:1rem">Protocolos RCP</button>
-            <button class="btn" onclick="navigate('atragantamiento')">Atragantamientos</button>
+            <div class="portal-grid">
+                <div class="portal-card" onclick="navigate('rcp')"><h2>RCP</h2><button class="btn">ABRIR</button></div>
+                <div class="portal-card" onclick="navigate('atragantamiento')"><h2>Heimlich</h2><button class="btn">ABRIR</button></div>
+            </div>
         </main>
     </section>
 
     <section id="rcp" class="page-section">
-        <header><h1>Protocolo RCP</h1></header>
+        <header><h1>RCP</h1></header>
         <main class="container">
-            <button onclick="navigate('paux')" class="back-btn">⬅ Volver</button>
-            <div class="card"><h3>Adultos</h3><img src="rcp-adultos.jpg" class="graphic"></div>
-            <div class="card"><h3>Niños</h3><img src="rcp-ninos.jpg" class="graphic"></div>
-            <div class="card"><h3>Bebés</h3><img src="rcp-bebes.jpg" class="graphic"></div>
+            <button class="back-btn" onclick="navigate('paux')">⬅ Volver</button>
+            <div class="card"><h2>Adultos</h2><img src="rcp-adultos.jpg" style="width:100%"></div>
+            <div class="card"><h2>Niños</h2><img src="rcp-ninos.jpg" style="width:100%"></div>
+            <div class="card"><h2>Bebés</h2><img src="rcp-bebes.jpg" style="width:100%"></div>
         </main>
     </section>
 
     <section id="atragantamiento" class="page-section">
         <header><h1>Atragantamiento</h1></header>
         <main class="container">
-            <button onclick="navigate('paux')" class="back-btn">⬅ Volver</button>
-            <div class="card"><h3>Adultos y Niños</h3><img src="atragantamiento-adultos-ninos.jpg" class="graphic"></div>
-            <div class="card"><h3>Bebés</h3><div class="baby-warning">¡OJO! Sin golpes en el abdomen.</div><img src="atragantamiento-bebes.jpg" class="graphic"></div>
+            <button class="back-btn" onclick="navigate('paux')">⬅ Volver</button>
+            <div class="card"><h2>Adultos/Niños</h2><img src="atragantamiento-adultos-ninos.jpg" style="width:100%"></div>
+            <div class="card"><h2>Bebés</h2><div class="baby-warning">SIN compresiones abdominales.</div><img src="atragantamiento-bebes.jpg" style="width:100%"></div>
         </main>
     </section>
 
-    <footer>Portal Emergencias v5.0 | Funcionamiento Offline</footer>
+    <footer><p>Portal Táctico v4.0 - Verifique protocolos con 112.</p></footer>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // NAVEGACIÓN SPA
+        // SPA Logic
         function navigate(id) {
             document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             document.querySelectorAll('.navbar button').forEach(b => b.classList.remove('active-nav'));
             const btn = document.getElementById('nav-' + id);
             if(btn) btn.classList.add('active-nav');
-            if(id === 'mapa' && map) setTimeout(() => map.invalidateSize(), 300);
+            if(id === 'mapa' && map) setTimeout(() => map.invalidateSize(), 200);
             window.scrollTo(0,0);
         }
 
-        // LÓGICA DE MAPA (Leaflet + Overpass)
+        // Checklist Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const boxes = document.querySelectorAll('input[type="checkbox"]');
+            const update = () => {
+                const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
+                const p = Math.round((checked / boxes.length) * 100);
+                document.getElementById('progress-bar').value = p;
+                document.getElementById('progress-text').innerText = p + '%';
+            };
+            boxes.forEach(b => {
+                if(localStorage.getItem(b.id) === 'true') { b.checked = true; b.closest('.item').classList.add('checked'); }
+                b.onchange = (e) => {
+                    localStorage.setItem(b.id, e.target.checked);
+                    e.target.closest('.item').classList.toggle('checked', e.target.checked);
+                    update();
+                };
+            });
+            update();
+        });
+
+        // Map Logic (ROBUSTA)
         let map, markers;
         function initMap() {
-            map = L.map('map').setView([40.41, -3.70], 6);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap'
-            }).addTo(map);
+            map = L.map('map').setView([40.41, -3.7], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             markers = L.featureGroup().addTo(map);
         }
         window.onload = initMap;
 
-        function setStatus(msg) {
-            const el = document.getElementById('loading-status');
-            el.style.display = msg ? 'block' : 'none';
-            el.innerText = msg;
-        }
-
         function buscarPorDireccion() {
-            const dir = document.getElementById('dir-input').value;
-            if(!dir) return;
-            setStatus("Buscando dirección...");
+            const dir = document.getElementById('direccion-input').value;
+            if(!dir) return alert("Escribe una dirección");
+            setStatus("Buscando coordenadas...");
             fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dir)}&limit=1`)
-                .then(r => r.json()).then(data => {
-                    if(data[0]) {
-                        const {lat, lon} = data[0];
-                        realizarBusquedaTactica(lat, lon);
-                    } else {
-                        setStatus("Dirección no encontrada.");
-                    }
-                }).catch(() => setStatus("Error al buscar dirección."));
+                .then(r => r.json()).then(d => {
+                    if(d[0]) {
+                        const {lat, lon} = d[0];
+                        map.setView([lat, lon], 14);
+                        markers.clearLayers();
+                        L.marker([lat, lon]).addTo(markers).bindPopup("Tu búsqueda").openPopup();
+                        consultarOverpass(lat, lon);
+                    } else alert("No encontrado");
+                });
         }
 
         function buscarCercanos() {
-            setStatus("Obteniendo GPS...");
-            navigator.geolocation.getCurrentPosition(pos => {
-                realizarBusquedaTactica(pos.coords.latitude, pos.coords.longitude);
-            }, () => setStatus("Error: Activa el GPS del móvil."));
+            navigator.geolocation.getCurrentPosition(p => {
+                const {latitude: lat, longitude: lon} = p.coords;
+                map.setView([lat, lon], 14);
+                markers.clearLayers();
+                L.marker([lat, lon]).addTo(markers).bindPopup("Tú").openPopup();
+                consultarOverpass(lat, lon);
+            });
         }
 
-        function realizarBusquedaTactica(lat, lon) {
-            map.setView([lat, lon], 14);
-            markers.clearLayers();
-            L.marker([lat, lon], {title: "Tú"}).addTo(markers).bindPopup("<b>Tu posición</b>").openPopup();
-            consultarOverpass(lat, lon);
+        function setStatus(msg) {
+            const el = document.getElementById('loading-status');
+            el.style.display = 'block';
+            el.innerText = msg;
         }
 
         function consultarOverpass(lat, lon) {
-            // Consulta simplificada para evitar errores 504
-            const query = `[out:json][timeout:15];(node["amenity"~"police|fire_station"](around:5000,${lat},${lon});way["amenity"~"police|fire_station"](around:5000,${lat},${lon}););out center;`;
+            const query = `[out:json][timeout:15];(node["amenity"~"police|fire_station"](around:5000,${lat},${lon});way["amenity"~"police|fire_station"](around:5000,${lat},${lon});node["name"~"Cruz Roja|Protecci.n Civil",i](around:5000,${lat},${lon}););out center;`;
             
             const servers = [
-                "https://overpass.osm.ch/api/interpreter",
-                "https://lz4.overpass-api.de/api/interpreter",
+                "https://overpass.osm.ch/api/interpreter", // Suizo (Más estable)
+                "https://lz4.overpass-api.de/api/interpreter", 
                 "https://overpass-api.de/api/interpreter"
             ];
 
             let i = 0;
-            const fetchTry = () => {
+            const tryFetch = () => {
                 if(i >= servers.length) {
-                    setStatus("Servidores saturados. Reintenta en un momento.");
+                    setStatus("Error: Todos los servidores saturados. Reintenta en 1 min.");
                     return;
                 }
-                setStatus(`Consultando Servidor ${i+1}...`);
-                fetch(servers[i], { method: 'POST', body: 'data=' + encodeURIComponent(query) })
-                    .then(r => r.json())
-                    .then(data => procesarResultados(data.elements))
-                    .catch(() => { i++; fetchTry(); });
+                setStatus(`Conectando a Servidor ${i+1}/${servers.length}...`);
+                
+                fetch(servers[i], {
+                    method: 'POST',
+                    body: 'data=' + encodeURIComponent(query)
+                })
+                .then(r => { if(!r.ok) throw new Error(); return r.json(); })
+                .then(d => procesar(d.elements))
+                .catch(() => { i++; tryFetch(); });
             };
-            fetchTry();
+            tryFetch();
         }
 
-        function procesarResultados(elements) {
-            setStatus(null);
-            const list = document.getElementById('res-list');
-            list.innerHTML = "";
+        function procesar(els) {
+            document.getElementById('loading-status').style.display = 'none';
+            const res = document.getElementById('results-container');
+            res.innerHTML = "";
+            if(els.length === 0) return res.innerHTML = "No se hallaron recursos en 5km.";
             
-            if(elements.length === 0) {
-                list.innerHTML = "No se encontraron comisarías ni bomberos en 5km.";
+            els.forEach(e => {
+                const l = e.lat || e.center.lat, o = e.lon || e.center.lon;
+                const n = e.tags.name || e.tags.amenity || "Recurso";
+                L.marker([l, o]).addTo(markers).bindPopup(n);
+                res.innerHTML += `<div class="result-item"><div><strong>${n}</strong></div><a href="https://www.google.com/maps/dir/?api=1&destination=${l},${o}" target="_blank" class="btn" style="width:auto">Ir</a></div>`;
+            });
+            document.getElementById('btn-download').style.display = 'block';
+        }
+
+        // Timer 333
+        setInterval(() => {
+            const now = new Date();
+            const h = now.getHours();
+            let next = h + (3 - (h % 3));
+            if(h % 3 === 0 && now.getMinutes() < 3) {
+                document.getElementById('countdown').innerText = "VENTANA ACTIVA";
                 return;
             }
+            if(next >= 24) next = 0;
+            document.getElementById('next-window-text').innerText = `Siguiente: ${next}:00`;
+        }, 1000);
 
-            elements.forEach(el => {
-                const lat = el.lat || el.center.lat;
-                const lon = el.lon || el.center.lon;
-                const tipo = el.tags.amenity === "police" ? "Policía" : "Bomberos";
-                const nombre = el.tags.name || tipo;
-
-                L.marker([lat, lon]).addTo(markers).bindPopup(`<b>${nombre}</b><br>${tipo}`);
-                
-                list.innerHTML += `
-                    <div class="result-item">
-                        <div><strong>${nombre}</strong><br><small>${tipo}</small></div>
-                        <a href="https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}" target="_blank" class="btn" style="width:auto; background:#4caf50">Ir</a>
-                    </div>
-                `;
-            });
-            map.fitBounds(markers.getBounds().pad(0.1));
-        }
-
-        // LÓGICA MOCHILA (PERSISTENCIA)
-        const checks = document.querySelectorAll('.m-check');
-        checks.forEach(c => {
-            if(localStorage.getItem(c.id) === 'true') c.checked = true;
-            c.onchange = () => {
-                localStorage.setItem(c.id, c.checked);
-                actualizarProgreso();
-            }
-        });
-
-        function actualizarProgreso() {
-            const total = checks.length;
-            const checkeados = document.querySelectorAll('.m-check:checked').length;
-            const porc = Math.round((checkeados/total)*100);
-            document.getElementById('p-bar').value = porc;
-            document.getElementById('p-text').innerText = porc + '%';
-        }
-        actualizarProgreso();
-
-        // SERVICE WORKER
+        // PWA Registration
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('./sw.js');
+            navigator.serviceWorker.register('./sw.js').then(() => console.log("PWA OK"));
         }
     </script>
 </body>
