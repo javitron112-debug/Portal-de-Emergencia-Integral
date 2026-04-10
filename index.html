@@ -32,7 +32,7 @@
             color: var(--text-color);
         }
 
-        /* Utilidad SPA */
+        /* SPA Logic */
         .page-section { display: none; animation: fadeIn 0.3s; }
         .page-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -50,144 +50,53 @@
         }
 
         .navbar button {
-            background: none;
-            border: none;
-            color: white;
-            padding: 0.5rem 1rem;
-            font-weight: bold;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: color 0.3s;
+            background: none; border: none; color: white;
+            padding: 0.5rem 1rem; font-weight: bold;
+            font-size: 0.95rem; cursor: pointer; transition: color 0.3s;
         }
 
-        .navbar button:hover, .navbar button.active-nav {
-            color: var(--primary-color);
-        }
+        .navbar button:hover, .navbar button.active-nav { color: var(--primary-color); }
 
-        /* Banners y Headers */
         .alert-banner {
-            background-color: var(--alert-bg);
-            color: var(--alert-text);
-            text-align: center;
-            padding: 1rem;
-            font-weight: bold;
-            font-size: 1.1rem;
-            border-bottom: 3px solid #fbc02d;
+            background-color: var(--alert-bg); color: var(--alert-text);
+            text-align: center; padding: 1rem; font-weight: bold;
+            font-size: 1.1rem; border-bottom: 3px solid #fbc02d;
         }
 
-        .info-banner {
-            background-color: var(--accent-color);
-            color: var(--white);
-            text-align: center;
-            padding: 0.8rem;
-            font-weight: bold;
-            font-size: 0.95rem;
-        }
-
-        .number-112 {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--primary-color);
-            background-color: var(--white);
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            border: 2px solid var(--primary-color);
-        }
-
-        header {
-            background-color: var(--primary-color);
-            color: var(--white);
-            padding: 2rem 1rem;
-            text-align: center;
-        }
-
+        header { background-color: var(--primary-color); color: var(--white); padding: 2rem 1rem; text-align: center; }
         header h1 { margin: 0; font-size: 2.2rem; }
 
-        .container {
-            max-width: 900px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
 
-        /* Tarjetas */
-        .card {
-            background: var(--white);
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
+        .card { background: var(--white); border-radius: 8px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
 
-        h2 {
-            color: var(--primary-color);
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 0.5rem;
-            margin-top: 0;
-        }
+        h2 { color: var(--primary-color); border-bottom: 2px solid #ddd; padding-bottom: 0.5rem; margin-top: 0; }
 
-        /* Estilos Inicio */
-        .portal-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-        }
-
+        /* Portal Cards */
+        .portal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
         .portal-card {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            text-align: center;
-            border: 2px solid transparent;
-            transition: border-color 0.3s, transform 0.3s;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            background-color: #fff; padding: 2rem; border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;
+            border: 2px solid transparent; transition: border-color 0.3s, transform 0.3s;
+            cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;
         }
-
-        .portal-card:hover {
-            border-color: var(--secondary-color);
-            transform: translateY(-5px);
-        }
-
+        .portal-card:hover { border-color: var(--secondary-color); transform: translateY(-5px); }
         .portal-card .icon { font-size: 3.5rem; margin-bottom: 1rem; }
         
         .btn {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 1rem;
-            border-radius: 4px;
-            margin-top: 1rem;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-            width: 100%;
+            background-color: var(--secondary-color); color: white;
+            padding: 1rem; border-radius: 4px; margin-top: 1rem;
+            font-weight: bold; border: none; cursor: pointer; width: 100%;
         }
 
-        /* Estilos Mochila */
+        /* Mochila Styles */
         progress { width: 100%; height: 20px; accent-color: #2e7d32; }
-
         .progress-container {
-            background: var(--white);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            text-align: center;
-            position: sticky;
-            top: 60px;
-            z-index: 100;
+            background: var(--white); padding: 1rem; border-radius: 8px;
+            margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center; position: sticky; top: 60px; z-index: 100;
         }
-
-        .category h2 {
-            background-color: var(--secondary-color);
-            color: white;
-            padding: 1rem;
-            border-radius: 8px 8px 0 0;
-            margin: -1.5rem -1.5rem 1.5rem -1.5rem;
-        }
-
+        .category h2 { background-color: var(--secondary-color); color: white; padding: 1rem; border-radius: 8px 8px 0 0; margin: -1.5rem -1.5rem 1.5rem -1.5rem; }
         .item-list { list-style: none; padding: 0; margin: 0; }
         .item { display: flex; align-items: flex-start; padding: 1rem; border-bottom: 1px solid #ddd; }
         .item.checked { background-color: #f1f8e9; }
@@ -195,98 +104,25 @@
         input[type="checkbox"] { margin-top: 0.3rem; margin-right: 1rem; width: 20px; height: 20px; }
         .item-title { font-weight: 600; display: block; }
         .item-desc { font-size: 0.85rem; color: #666; }
-
         .reset-btn { background-color: #e0e0e0; color: var(--text-color); }
-        .reset-btn:hover { background-color: #bdbdbd; }
         
-        .graphic-container { margin: 1.5rem 0; text-align: center; }
-        .graphic-container img { max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-
-        /* Estilos Primeros Auxilios */
-        .pas-protocol { border-left: 5px solid var(--primary-color); }
-        .emergency-card {
-            background-color: #fff9c4;
-            border-left: 4px solid #fbc02d;
-            padding: 1rem;
-            margin: 1.5rem 0;
-            border-radius: 0 4px 4px 0;
-        }
-        .baby-warning {
-            background-color: #ffcccc;
-            border: 2px solid var(--primary-color);
-            padding: 1rem;
-            border-radius: 8px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 1rem;
-        }
-        .back-btn { background-color: #607d8b; margin-bottom: 1rem; width: auto; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 4px; cursor: pointer; font-weight: bold; display: inline-block;}
-
-        /* Estilos Plan 333 */
-        .status-panel-333 {
-            background: linear-gradient(135deg, var(--white), #fff3e0);
-            border: 2px solid var(--accent-color);
-            text-align: center;
-        }
-        .timer-333 {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--primary-color);
-            font-family: monospace;
-            margin: 0.5rem 0;
-        }
-        .rule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; margin-top: 1.5rem; }
-        .rule-box { padding: 1.5rem; border-radius: 8px; background-color: var(--light-bg); }
-        .rule-box h3 { margin-top: 0; display: flex; align-items: center; gap: 8px; }
-
-        /* Estilos Mapa Táctico */
-        #map {
-            height: 400px;
-            width: 100%;
-            border-radius: 8px;
-            border: 2px solid #ddd;
-            margin-bottom: 1rem;
-            z-index: 1; 
-        }
+        /* Map Styles */
+        #map { height: 400px; width: 100%; border-radius: 8px; border: 2px solid #ddd; margin-bottom: 1rem; z-index: 1; }
         .search-bar { display: flex; gap: 0.5rem; width: 100%; margin-bottom: 1.5rem; flex-wrap: wrap; }
         .search-input { flex: 1; min-width: 250px; padding: 0.8rem; border: 2px solid #ddd; border-radius: 4px; font-size: 1rem; }
-        .btn-full { flex: 1; min-width: 200px; }
-        .btn-danger { background-color: var(--primary-color); }
-        .btn-danger:hover { background-color: #b71c1c; }
+        .result-item { background-color: #f8f9fa; border-left: 4px solid var(--secondary-color); padding: 1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
         
-        .result-item {
-            background-color: #f8f9fa;
-            border-left: 4px solid var(--secondary-color);
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 0 4px 4px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
+        #loading-status { 
+            display: none; background: #fff3e0; border: 1px solid #ffe0b2;
+            padding: 1rem; border-radius: 4px; margin-bottom: 1rem;
+            font-weight: bold; color: #e65100; text-align: center;
         }
-        .result-info h3 { margin: 0 0 0.3rem 0; color: var(--dark-color); }
-        .result-info p { margin: 0; color: #666; font-size: 0.9rem; }
-        .btn-navigate {
-            background-color: #2e7d32;
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            text-decoration: none;
-            font-weight: bold;
-            display: inline-block;
-        }
-        #loading { display: none; text-align: center; font-weight: bold; color: var(--primary-color); margin: 1rem 0; }
-        .instruction-box {
-            background-color: #e3f2fd;
-            border: 2px solid var(--secondary-color);
-            padding: 1.5rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-        }
-        .instruction-box ol { margin-bottom: 0; }
-        .instruction-box li { margin-bottom: 0.5rem; }
+
+        .graphic-container { margin: 1.5rem 0; text-align: center; }
+        .graphic-container img { max-width: 100%; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .baby-warning { background-color: #ffcccc; border: 2px solid var(--primary-color); padding: 1rem; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 1rem; }
+        .emergency-card { background-color: #fff9c4; border-left: 4px solid #fbc02d; padding: 1rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; }
+        .back-btn { background-color: #607d8b; margin-bottom: 1rem; width: auto; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 4px; cursor: pointer; font-weight: bold; display: inline-block;}
 
         footer { text-align: center; padding: 2rem; background-color: #ddd; color: var(--dark-color); margin-top: 2rem; }
     </style>
@@ -302,46 +138,30 @@
     </nav>
 
     <div class="alert-banner">
-        ⚠️ ATENCIÓN: Si hay una emergencia AHORA, llama al <span class="number-112">112</span>, pon el altavoz y sigue sus instrucciones.
+        ⚠️ ATENCIÓN: Si hay una emergencia AHORA, llama al <span class="number-112">112</span>.
     </div>
 
     <section id="inicio" class="page-section active">
         <header>
             <h1>Portal de Emergencia Integral</h1>
-            <p>Preparación ciudadana, comunicaciones, mapas y primeros auxilios. Instalable y Offline.</p>
+            <p>Preparación ciudadana, comunicaciones y primeros auxilios. 100% Offline tras instalar.</p>
         </header>
         <main class="container">
             <div class="portal-grid">
                 <div class="portal-card" onclick="navigate('mochila')">
-                    <div>
-                        <div class="icon">🎒</div>
-                        <h2>Mochila 72 Horas</h2>
-                        <p>Lista interactiva de supervivencia esencial para escenarios de evacuación.</p>
-                    </div>
+                    <div><div class="icon">🎒</div><h2>Mochila 72 Horas</h2><p>Checklist interactivo de supervivencia.</p></div>
                     <button class="btn">VER CHECKLIST</button>
                 </div>
                 <div class="portal-card" onclick="navigate('plan333')">
-                    <div>
-                        <div class="icon">📻</div>
-                        <h2>Plan 333 (Radio)</h2>
-                        <p>Protocolo ciudadano de radiocomunicaciones para ahorro de batería "Grid Down".</p>
-                    </div>
+                    <div><div class="icon">📻</div><h2>Plan 333 (Radio)</h2><p>Protocolo de ahorro de batería.</p></div>
                     <button class="btn" style="background-color: var(--accent-color);">VER PROTOCOLO</button>
                 </div>
                 <div class="portal-card" onclick="navigate('mapa')">
-                    <div>
-                        <div class="icon">🗺️</div>
-                        <h2>Mapa Táctico</h2>
-                        <p>Buscador de Policía, Bomberos y Protección Civil en un radio de 5km.</p>
-                    </div>
+                    <div><div class="icon">🗺️</div><h2>Mapa Táctico</h2><p>Buscador de recursos de emergencia.</p></div>
                     <button class="btn" style="background-color: var(--dark-color);">ABRIR MAPA</button>
                 </div>
                 <div class="portal-card" onclick="navigate('paux')">
-                    <div>
-                        <div class="icon">🩹</div>
-                        <h2>Primeros Auxilios</h2>
-                        <p>Protocolos fácticos para RCP y atragantamiento (Adultos, Niños, Bebés).</p>
-                    </div>
+                    <div><div class="icon">🩹</div><h2>Primeros Auxilios</h2><p>Protocolos RCP y Atragantamiento.</p></div>
                     <button class="btn" style="background-color: var(--primary-color);">VER GUÍAS</button>
                 </div>
             </div>
@@ -349,778 +169,226 @@
     </section>
 
     <section id="mochila" class="page-section">
-        <header>
-            <h1>Mochila de 72 Horas</h1>
-            <p>Checklist exhaustivo basado en estándares de Protección Civil</p>
-        </header>
+        <header><h1>Mochila de 72 Horas</h1></header>
         <main class="container">
-            <div class="graphic-container">
-                <img src="mochila.jpg" alt="Gráfico Mochila de 72 Horas" onerror="this.style.display='none'">
-            </div>
-
-            <div class="progress-container">
-                <h3 style="margin-top: 0;">Progreso de Preparación: <span id="progress-text">0%</span></h3>
-                <progress id="progress-bar" value="0" max="100"></progress>
-            </div>
-
+            <div class="graphic-container"><img src="mochila.jpg" alt="Mochila" onerror="this.style.display='none'"></div>
+            <div class="progress-container"><h3>Progreso: <span id="progress-text">0%</span></h3><progress id="progress-bar" value="0" max="100"></progress></div>
+            
             <div class="card category">
                 <h2>💧 1. Hidratación y Nutrición</h2>
                 <ul class="item-list">
-                    <li class="item">
-                        <input type="checkbox" id="item-agua">
-                        <label for="item-agua">
-                            <span class="item-title">Agua embotellada (Mín. 3 Litros)</span>
-                            <span class="item-desc">Racionamiento básico. En botellas pequeñas para distribuir el peso.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-filtro">
-                        <label for="item-filtro">
-                            <span class="item-title">Pastillas potabilizadoras o Filtro</span>
-                            <span class="item-desc">Vital si los 3 litros se agotan y debes recurrir a fuentes no seguras.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-comida">
-                        <label for="item-comida">
-                            <span class="item-title">Comida no perecedera (3 días)</span>
-                            <span class="item-desc">Barritas energéticas y frutos secos (alto aporte calórico, bajo peso).</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-conservas">
-                        <label for="item-conservas">
-                            <span class="item-title">Conservas con abrefácil</span>
-                            <span class="item-desc">Si no tienen abrefácil, incluir un abrelatas manual pequeño.</span>
-                        </label>
-                    </li>
+                    <li class="item"><input type="checkbox" id="m1"><label for="m1"><span class="item-title">Agua (3L min)</span><span>Botellas pequeñas.</span></label></li>
+                    <li class="item"><input type="checkbox" id="m2"><label for="m2"><span class="item-title">Potabilizadoras</span><span>Pastillas o filtro.</span></label></li>
+                    <li class="item"><input type="checkbox" id="m3"><label for="m3"><span class="item-title">Comida</span><span>Barritas, frutos secos, latas.</span></label></li>
                 </ul>
             </div>
-
-            <div class="card category">
-                <h2>⛺ 2. Refugio y Ropa</h2>
-                <ul class="item-list">
-                    <li class="item">
-                        <input type="checkbox" id="item-manta">
-                        <label for="item-manta">
-                            <span class="item-title">Manta térmica aluminizada</span>
-                            <span class="item-desc">Retiene el calor corporal. Imprescindible para evitar hipotermia.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-chubasquero">
-                        <label for="item-chubasquero">
-                            <span class="item-title">Poncho impermeable / Chubasquero</span>
-                            <span class="item-desc">La ropa mojada acelera drásticamente la pérdida de calor.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-ropa">
-                        <label for="item-ropa">
-                            <span class="item-title">Ropa por capas y Calzado cerrado</span>
-                            <span class="item-desc">Ropa de recambio. Botas o zapatillas con suela gruesa para escombros.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-gorro">
-                        <label for="item-gorro">
-                            <span class="item-title">Gorro y guantes</span>
-                            <span class="item-desc">Para evitar la pérdida de temperatura en las extremidades durante la noche.</span>
-                        </label>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="card category">
-                <h2>🔦 3. Iluminación y Fuego</h2>
-                <ul class="item-list">
-                    <li class="item">
-                        <input type="checkbox" id="item-linterna">
-                        <label for="item-linterna">
-                            <span class="item-title">Linterna LED (Frontal o mano)</span>
-                            <span class="item-desc">El modelo frontal deja las manos libres para trabajar o asistir a otros.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-pilas">
-                        <label for="item-pilas">
-                            <span class="item-title">Pilas de repuesto</span>
-                            <span class="item-desc">Almacenadas en una bolsa estanca separada para evitar sulfatación.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-fuego">
-                        <label for="item-fuego">
-                            <span class="item-title">Mechero y cerillas impermeables</span>
-                            <span class="item-desc">Para generar calor, hervir agua o hacer señales.</span>
-                        </label>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="card category">
-                <h2>🧰 4. Herramientas y Seguridad</h2>
-                <ul class="item-list">
-                    <li class="item">
-                        <input type="checkbox" id="item-navaja">
-                        <label for="item-navaja">
-                            <span class="item-title">Navaja multiusos</span>
-                            <span class="item-desc">Herramienta base para reparaciones, preparación de comida o rescate.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-cuerda">
-                        <label for="item-cuerda">
-                            <span class="item-title">Cinta americana y Cuerda ligera</span>
-                            <span class="item-desc">Para reparaciones improvisadas de refugios o equipo dañado.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-silbato">
-                        <label for="item-silbato">
-                            <span class="item-title">Silbato de emergencia</span>
-                            <span class="item-desc">Gasta menos energía que gritar si quedas atrapado bajo escombros.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-mapa-fisico">
-                        <label for="item-mapa-fisico">
-                            <span class="item-title">Mapa físico de la zona</span>
-                            <span class="item-desc">Crucial si el móvil falla o no tienes los mapas offline descargados.</span>
-                        </label>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="card category">
-                <h2>⚕️ 5. Salud y Botiquín</h2>
-                <ul class="item-list">
-                    <li class="item">
-                        <input type="checkbox" id="item-botiquin">
-                        <label for="item-botiquin">
-                            <span class="item-title">Botiquín de Primeros Auxilios</span>
-                            <span class="item-desc">Gasas, vendas, esparadrapo, desinfectante, tiritas y analgésicos.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-medicacion">
-                        <label for="item-medicacion">
-                            <span class="item-title">Medicación personal vital</span>
-                            <span class="item-desc">Reserva de 3 a 5 días de cualquier tratamiento crónico (con copia de receta).</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-higiene">
-                        <label for="item-higiene">
-                            <span class="item-title">Kit de higiene y bolsas de basura</span>
-                            <span class="item-desc">Toallitas húmedas. Las bolsas industriales sirven para aislar o impermeabilizar.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-mascarillas">
-                        <label for="item-mascarillas">
-                            <span class="item-title">Mascarillas</span>
-                            <span class="item-desc">Protección respiratoria contra polvo, humo o escombros.</span>
-                        </label>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="card category">
-                <h2>📁 6. Comunicación y Documentos</h2>
-                <ul class="item-list">
-                    <li class="item">
-                        <input type="checkbox" id="item-radio">
-                        <label for="item-radio">
-                            <span class="item-title">Radio AM/FM portátil</span>
-                            <span class="item-desc">A pilas o dinamo. Vía crítica para recibir directrices de Protección Civil.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-docs">
-                        <label for="item-docs">
-                            <span class="item-title">Documentos en bolsa estanca, Efectivo y Llaves</span>
-                            <span class="item-desc">Copias de DNI/Seguros. Billetes pequeños (datáfonos caídos). Copia de llaves de casa/coche.</span>
-                        </label>
-                    </li>
-                    <li class="item">
-                        <input type="checkbox" id="item-libreta">
-                        <label for="item-libreta">
-                            <span class="item-title">Libreta y bolígrafo</span>
-                            <span class="item-desc">Para anotar frecuencias de radio, direcciones o dejar mensajes a familiares.</span>
-                        </label>
-                    </li>
-                </ul>
-            </div>
-
-            <button class="btn reset-btn" id="reset-btn">Limpiar lista y empezar de nuevo</button>
+            <button class="btn reset-btn" id="reset-btn">Limpiar lista</button>
         </main>
     </section>
 
     <section id="plan333" class="page-section">
-        <div class="info-banner">
-            Aviso Fáctico: Iniciativa ciudadana. NO sustituye a Protección Civil ni a los canales oficiales del Estado.
-        </div>
-        <header style="background-color: var(--accent-color);">
-            <h1>Plan 333 de Emergencias</h1>
-            <p>Protocolo Operativo de Radiocomunicaciones para Escenarios "Grid Down"</p>
-        </header>
+        <header style="background-color: var(--accent-color);"><h1>Plan 333 Radio</h1></header>
         <main class="container">
             <div class="card status-panel-333">
-                <h2>Próxima Ventana de Comunicación</h2>
-                <p>Mantén tu equipo apagado para ahorrar batería hasta el siguiente ciclo:</p>
+                <h2>Próxima Ventana</h2>
                 <div class="timer-333" id="countdown">Calculando...</div>
-                <p id="next-window-text" style="font-weight: bold;">Próxima apertura a las: --:--</p>
+                <p id="next-window-text">--:--</p>
             </div>
-
             <div class="card">
-                <h2>¿Qué es el Plan 333?</h2>
-                <p>Es un estándar no oficial diseñado para optimizar el consumo de batería de walkie-talkies en escenarios de aislamiento extremo (caída total de redes eléctricas y telefónicas). Su eficacia radica en concentrar a los usuarios aislados en momentos predecibles.</p>
-            </div>
-
-            <div class="card">
-                <h2>La Regla del 3-3-3</h2>
-                <div class="rule-grid">
-                    <div class="rule-box" style="border-top: 4px solid #f57c00;">
-                        <h3 style="color: #f57c00;">📡 1. Canal 3</h3>
-                        <p>Sintonizar el Canal 3 sin subtonos de privacidad. En España aplica a:</p>
-                        <ul>
-                            <li><strong>PMR446:</strong> Walkies de uso libre.</li>
-                            <li><strong>CB-27:</strong> Banda Ciudadana.</li>
-                        </ul>
-                    </div>
-                    <div class="rule-box" style="border-top: 4px solid #1976d2;">
-                        <h3 style="color: #1976d2;">🕒 2. Cada 3 Horas</h3>
-                        <p>Encender la radio solo en las siguientes horas locales:</p>
-                        <p><strong>00:00 - 03:00 - 06:00 - 09:00 - 12:00 - 15:00 - 18:00 - 21:00</strong></p>
-                    </div>
-                    <div class="rule-box" style="border-top: 4px solid #d32f2f;">
-                        <h3 style="color: #d32f2f;">⏱️ 3. Durante 3 Minutos</h3>
-                        <p>El equipo permanece encendido solo 180 segundos:</p>
-                        <ul>
-                            <li><strong>Minuto 1:</strong> Solo escucha.</li>
-                            <li><strong>Minuto 2:</strong> Emergencias vitales.</li>
-                            <li><strong>Minuto 3:</strong> Logística.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card">
-                <h2>Consideraciones Críticas</h2>
-                <p>Limitar la escucha a 3 minutos puede resultar en la pérdida de llamadas de auxilio aleatorias. Además, en CB-27, el <strong>Canal 9</strong> es el estándar oficial universal de emergencias. El plan 333 es útil para ahorro extremo, pero si dispones de energía suficiente, mantén la escucha continua en canales oficiales.</p>
+                <h2>La Regla 3-3-3</h2>
+                <p>Canal 3 | Cada 3 Horas | Durante 3 Minutos.</p>
             </div>
         </main>
     </section>
 
     <section id="mapa" class="page-section">
-        <header style="background-color: var(--dark-color);">
-            <h1 style="color: white;">Buscador Táctico de Emergencias</h1>
-            <p style="color: white;">Localizador de Policía, Bomberos, Cruz Roja y Protección Civil (Radio 5km)</p>
-        </header>
+        <header style="background-color: var(--dark-color);"><h1 style="color:white">Buscador de Emergencias</h1></header>
         <main class="container">
-            
-            <div class="instruction-box">
-                <h2 style="margin-top:0;">📱 Preparación Vital: Mapas Offline (Sin Internet)</h2>
-                <p>Para que el botón "Cómo llegar" funcione durante un apagón o caída de red, <strong>DEBES descargar tu zona en Google Maps AHORA</strong> (mientras tienes internet):</p>
-                <ol>
-                    <li>Abre la aplicación <strong>Google Maps</strong> en tu móvil.</li>
-                    <li>Toca tu <strong>foto de perfil o inicial</strong> arriba a la derecha.</li>
-                    <li>Selecciona <strong>Mapas sin conexión</strong> (Offline maps).</li>
-                    <li>Toca en <strong>Selecciona tu propio mapa</strong>.</li>
-                    <li>Ajusta el recuadro para que cubra tu ciudad y rutas de evacuación, y pulsa <strong>Descargar</strong>.</li>
-                </ol>
-            </div>
-
             <div class="card">
                 <div class="search-bar">
-                    <input type="text" id="direccion-input" class="search-input" placeholder="Ej: Puerta del Sol, Madrid">
-                    <button class="btn" style="width:auto;" onclick="buscarPorDireccion()">🔍 Buscar Dirección</button>
+                    <input type="text" id="direccion-input" class="search-input" placeholder="Ciudad o dirección...">
+                    <button class="btn" style="width:auto" onclick="buscarPorDireccion()">🔍 Buscar</button>
                 </div>
-
-                <div class="controls">
-                    <button class="btn btn-full" onclick="buscarCercanos()">📍 Usar Mi Ubicación GPS Actual</button>
-                </div>
+                <button class="btn" onclick="buscarCercanos()">📍 Mi ubicación GPS</button>
                 
-                <p id="loading">Conectando con servidores y buscando recursos... (Por favor, espera)</p>
+                <div id="loading-status"></div>
                 
                 <div id="map"></div>
             </div>
-
             <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;">
-                    <h2 style="margin:0;">Resultados Encontrados</h2>
-                    <button class="btn btn-danger" onclick="descargarResultados()" id="btn-download" style="display:none; max-width: 300px; margin:0;">📥 Descargar Lista (TXT)</button>
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <h2 style="margin:0">Resultados</h2>
+                    <button class="btn btn-danger" onclick="descargarResultados()" id="btn-download" style="display:none; max-width:200px">📥 TXT</button>
                 </div>
-                
-                <div id="results-container">
-                    <p>Escribe una dirección o usa tu ubicación actual para escanear un radio de 5km.</p>
-                </div>
+                <div id="results-container"><p>Inicia una búsqueda para ver recursos en 5km.</p></div>
             </div>
-
         </main>
     </section>
 
     <section id="paux" class="page-section">
-        <header>
-            <h1>Primeros Auxilios Básicos</h1>
-            <p>Protocolos fácticos para personal no sanitario.</p>
-        </header>
+        <header><h1>Primeros Auxilios</h1></header>
         <main class="container">
-            <div class="card pas-protocol">
-                <h2>Conducta P.A.S. (Universal)</h2>
-                <ul>
-                    <li><strong>1. PROTEGER:</strong> Haz seguro el lugar antes de acercarte.</li>
-                    <li><strong>2. AVISAR:</strong> Llama al 112 y pon el altavoz.</li>
-                    <li><strong>3. SOCORRER:</strong> Actúa según estos protocolos.</li>
-                </ul>
-            </div>
             <div class="portal-grid">
-                <div class="portal-card" onclick="navigate('rcp')">
-                    <div class="icon">💓</div>
-                    <h2>Protocolo RCP</h2>
-                    <p>Parada cardiorrespiratoria (Adultos, Niños y Bebés).</p>
-                    <button class="btn">ABRIR GUÍA</button>
-                </div>
-                <div class="portal-card" onclick="navigate('atragantamiento')">
-                    <div class="icon">😮‍💨</div>
-                    <h2>Atragantamiento</h2>
-                    <p>Maniobra de Heimlich y actuación en lactantes.</p>
-                    <button class="btn">ABRIR GUÍA</button>
-                </div>
+                <div class="portal-card" onclick="navigate('rcp')"><h2>RCP</h2><button class="btn">ABRIR</button></div>
+                <div class="portal-card" onclick="navigate('atragantamiento')"><h2>Heimlich</h2><button class="btn">ABRIR</button></div>
             </div>
         </main>
     </section>
 
     <section id="rcp" class="page-section">
-        <header>
-            <h1>Protocolo RCP</h1>
-        </header>
+        <header><h1>RCP</h1></header>
         <main class="container">
-            <button class="btn back-btn" onclick="navigate('paux')">⬅ Volver a Primeros Auxilios</button>
-            
-            <div class="card">
-                <h2>👨 Adultos (>8 años)</h2>
-                <div class="emergency-card"><strong>Hecho:</strong> Para no entrenados, RCP "Solo manos". Ventilar retrasa las compresiones si no sabes.</div>
-                <div class="graphic-container">
-                    <img src="rcp-adultos.jpg" alt="RCP Adultos" onerror="this.style.display='none'">
-                </div>
-                <ol>
-                    <li>Boca arriba sobre superficie <strong>dura</strong>.</li>
-                    <li>Talón de una mano en el centro del pecho.</li>
-                    <li>Hundir <strong>5-6 cm</strong> a ritmo de 100-120/min.</li>
-                </ol>
-            </div>
-
-            <div class="card">
-                <h2>👦 Niños (1 a 8 años)</h2>
-                <div class="graphic-container">
-                    <img src="rcp-ninos.jpg" alt="RCP Niños" onerror="this.style.display='none'">
-                </div>
-                <ol>
-                    <li>Abrir vía aérea y dar <strong>5 ventilaciones iniciales</strong>.</li>
-                    <li>Compresiones: Talón de UNA mano. Hundir ~<strong>5 cm</strong>.</li>
-                    <li>Ritmo 15 compresiones : 2 ventilaciones.</li>
-                </ol>
-            </div>
-
-            <div class="card">
-                <h2>👶 Bebés (<1 año)</h2>
-                <div class="graphic-container">
-                    <img src="rcp-bebes.jpg" alt="RCP Bebés" onerror="this.style.display='none'">
-                </div>
-                <ol>
-                    <li><strong>5 ventilaciones:</strong> Boca cubre nariz y boca del bebé. Soplos muy suaves.</li>
-                    <li><strong>Compresiones:</strong> <strong>DOS DEDOS</strong> en centro del pecho. Hunde ~<strong>4 cm</strong>.</li>
-                </ol>
-            </div>
+            <button class="back-btn" onclick="navigate('paux')">⬅ Volver</button>
+            <div class="card"><h2>Adultos</h2><img src="rcp-adultos.jpg" style="width:100%"></div>
+            <div class="card"><h2>Niños</h2><img src="rcp-ninos.jpg" style="width:100%"></div>
+            <div class="card"><h2>Bebés</h2><img src="rcp-bebes.jpg" style="width:100%"></div>
         </main>
     </section>
 
     <section id="atragantamiento" class="page-section">
-        <header>
-            <h1>Atragantamiento Consciente</h1>
-        </header>
+        <header><h1>Atragantamiento</h1></header>
         <main class="container">
-            <button class="btn back-btn" onclick="navigate('paux')">⬅ Volver a Primeros Auxilios</button>
-            
-            <div class="card">
-                <h2>👨 Adulto / 👦 Niño (No puede toser ni hablar)</h2>
-                <div class="graphic-container">
-                    <img src="atragantamiento-adultos-ninos.jpg" alt="Atragantamiento General" onerror="this.style.display='none'">
-                </div>
-                <ol>
-                    <li><strong>5 golpes secos</strong> en la espalda (entre omóplatos).</li>
-                    <li><strong>5 compresiones (Heimlich):</strong> Abraza cintura, puño sobre ombligo, tira hacia adentro y arriba.</li>
-                    <li>Alterna ambos hasta que expulse o quede inconsciente.</li>
-                </ol>
-            </div>
-
-            <div class="card">
-                <h2>👶 Bebés (<1 año)</h2>
-                <div class="baby-warning">NUNCA compresiones abdominales (Heimlich) en bebés. Podrías destrozar sus órganos internos.</div>
-                <div class="graphic-container">
-                    <img src="atragantamiento-bebes.jpg" alt="Atragantamiento Bebés" onerror="this.style.display='none'">
-                </div>
-                <ol>
-                    <li>Bebé boca abajo en tu antebrazo. Da <strong>5 golpes secos</strong> en espalda.</li>
-                    <li>Gíralo boca arriba. Da <strong>5 compresiones en el pecho</strong> (con dos dedos).</li>
-                    <li>Alterna hasta que expulse el objeto.</li>
-                </ol>
-            </div>
+            <button class="back-btn" onclick="navigate('paux')">⬅ Volver</button>
+            <div class="card"><h2>Adultos/Niños</h2><img src="atragantamiento-adultos-ninos.jpg" style="width:100%"></div>
+            <div class="card"><h2>Bebés</h2><div class="baby-warning">SIN compresiones abdominales.</div><img src="atragantamiento-bebes.jpg" style="width:100%"></div>
         </main>
     </section>
 
-    <footer>
-        <p>Documento Offline Instalable (PWA). Verifique protocolos oficiales de Protección Civil siempre que sea posible.</p>
-    </footer>
+    <footer><p>Portal Táctico v4.0 - Verifique protocolos con 112.</p></footer>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // --- 0. REGISTRO DEL SERVICE WORKER (PWA) ---
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrado con éxito (Modo Offline Activado).');
-                    })
-                    .catch(error => {
-                        console.log('Fallo al registrar el ServiceWorker:', error);
-                    });
-            });
+        // SPA Logic
+        function navigate(id) {
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.querySelectorAll('.navbar button').forEach(b => b.classList.remove('active-nav'));
+            const btn = document.getElementById('nav-' + id);
+            if(btn) btn.classList.add('active-nav');
+            if(id === 'mapa' && map) setTimeout(() => map.invalidateSize(), 200);
+            window.scrollTo(0,0);
         }
 
-        // --- 1. LÓGICA DE NAVEGACIÓN SPA ---
-        function navigate(sectionId) {
-            document.querySelectorAll('.page-section').forEach(sec => {
-                sec.classList.remove('active');
-            });
-            
-            document.getElementById(sectionId).classList.add('active');
-            
-            document.querySelectorAll('.navbar button').forEach(btn => {
-                btn.classList.remove('active-nav');
-            });
-            
-            let navBtn = document.getElementById('nav-' + sectionId);
-            if(navBtn) {
-                navBtn.classList.add('active-nav');
-            } else if (sectionId === 'rcp' || sectionId === 'atragantamiento') {
-                document.getElementById('nav-paux').classList.add('active-nav');
-            }
-
-            // Recarga obligatoria del mapa para evitar fallos de renderizado al mostrar su pestaña
-            if (sectionId === 'mapa' && map) {
-                setTimeout(() => {
-                    map.invalidateSize();
-                }, 200);
-            }
-
-            window.scrollTo(0, 0);
-        }
-
-        // --- 2. LÓGICA CHECKLIST MOCHILA ---
+        // Checklist Logic
         document.addEventListener('DOMContentLoaded', () => {
-            const checkboxes = document.querySelectorAll('#mochila input[type="checkbox"]');
-            const progressBar = document.getElementById('progress-bar');
-            const progressText = document.getElementById('progress-text');
-            const resetBtn = document.getElementById('reset-btn');
-
-            function updateProgress() {
-                const total = checkboxes.length;
-                const checkedCount = document.querySelectorAll('#mochila input[type="checkbox"]:checked').length;
-                const percentage = total === 0 ? 0 : Math.round((checkedCount / total) * 100);
-                
-                progressBar.value = percentage;
-                progressText.textContent = percentage + '%';
-            }
-
-            checkboxes.forEach(box => {
-                const savedState = localStorage.getItem('mochila_spa_final_' + box.id);
-                if (savedState === 'true') {
-                    box.checked = true;
-                    box.closest('.item').classList.add('checked');
-                }
-
-                box.addEventListener('change', (e) => {
-                    localStorage.setItem('mochila_spa_final_' + e.target.id, e.target.checked);
-                    if (e.target.checked) {
-                        e.target.closest('.item').classList.add('checked');
-                    } else {
-                        e.target.closest('.item').classList.remove('checked');
-                    }
-                    updateProgress();
-                });
+            const boxes = document.querySelectorAll('input[type="checkbox"]');
+            const update = () => {
+                const checked = document.querySelectorAll('input[type="checkbox"]:checked').length;
+                const p = Math.round((checked / boxes.length) * 100);
+                document.getElementById('progress-bar').value = p;
+                document.getElementById('progress-text').innerText = p + '%';
+            };
+            boxes.forEach(b => {
+                if(localStorage.getItem(b.id) === 'true') { b.checked = true; b.closest('.item').classList.add('checked'); }
+                b.onchange = (e) => {
+                    localStorage.setItem(b.id, e.target.checked);
+                    e.target.closest('.item').classList.toggle('checked', e.target.checked);
+                    update();
+                };
             });
-
-            resetBtn.addEventListener('click', () => {
-                if(confirm("¿Estás seguro de que deseas desmarcar todos los elementos de la mochila?")) {
-                    checkboxes.forEach(box => {
-                        box.checked = false;
-                        box.closest('.item').classList.remove('checked');
-                        localStorage.removeItem('mochila_spa_final_' + box.id);
-                    });
-                    updateProgress();
-                }
-            });
-
-            updateProgress();
+            update();
         });
 
-        // --- 3. LÓGICA TEMPORIZADOR PLAN 333 ---
-        function updateCountdown() {
-            const now = new Date();
-            const currentHour = now.getHours();
-            
-            let nextHour = currentHour + (3 - (currentHour % 3));
-            let nextWindow = new Date(now);
-            
-            const countdownEl = document.getElementById('countdown');
-            const nextWindowTextEl = document.getElementById('next-window-text');
-
-            if (currentHour % 3 === 0 && now.getMinutes() < 3) {
-                countdownEl.innerText = "¡VENTANA ACTIVA!";
-                countdownEl.style.color = "var(--accent-color)";
-                nextWindowTextEl.innerText = "Transmite según protocolo (Escucha / Emergencia / Logística)";
-                return;
-            }
-
-            if (nextHour >= 24) {
-                nextHour = 0;
-                nextWindow.setDate(nextWindow.getDate() + 1);
-            }
-            
-            nextWindow.setHours(nextHour, 0, 0, 0);
-            
-            const diff = nextWindow - now;
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-            
-            const timeString = 
-                String(hours).padStart(2, '0') + ":" + 
-                String(minutes).padStart(2, '0') + ":" + 
-                String(seconds).padStart(2, '0');
-                
-            countdownEl.innerText = timeString;
-            countdownEl.style.color = "var(--primary-color)";
-            nextWindowTextEl.innerText = `Próxima apertura a las: ${String(nextHour).padStart(2, '0')}:00`;
-        }
-
-        setInterval(updateCountdown, 1000);
-        updateCountdown();
-
-        // --- 4. LÓGICA DEL MAPA TÁCTICO (LEAFLET + OVERPASS POST + FALLBACKS) ---
-        let map;
-        let markersGroup;
-        let resultadosGlobales = []; 
-
-        window.onload = function() {
-            initMap();
-        };
-
+        // Map Logic (ROBUSTA)
+        let map, markers;
         function initMap() {
-            map = L.map('map').setView([40.4168, -3.7038], 6); 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap contributors'
-            }).addTo(map);
-            markersGroup = L.featureGroup().addTo(map);
+            map = L.map('map').setView([40.41, -3.7], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            markers = L.featureGroup().addTo(map);
         }
+        window.onload = initMap;
 
         function buscarPorDireccion() {
-            const direccion = document.getElementById('direccion-input').value.trim();
-            if (!direccion) {
-                alert("Por favor, escribe una dirección en el cuadro de texto.");
-                return;
-            }
-
-            prepararBusqueda();
-            const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(direccion)}&limit=1`;
-
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.length > 0) {
-                        const lat = data[0].lat;
-                        const lon = data[0].lon;
-                        
-                        map.setView([lat, lon], 13);
-                        L.marker([lat, lon]).addTo(markersGroup).bindPopup(`<b>Origen:</b><br>${direccion}`).openPopup();
-                        
+            const dir = document.getElementById('direccion-input').value;
+            if(!dir) return alert("Escribe una dirección");
+            setStatus("Buscando coordenadas...");
+            fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(dir)}&limit=1`)
+                .then(r => r.json()).then(d => {
+                    if(d[0]) {
+                        const {lat, lon} = d[0];
+                        map.setView([lat, lon], 14);
+                        markers.clearLayers();
+                        L.marker([lat, lon]).addTo(markers).bindPopup("Tu búsqueda").openPopup();
                         consultarOverpass(lat, lon);
-                    } else {
-                        document.getElementById('loading').style.display = 'none';
-                        alert("No se encontró la dirección. Intenta añadir ciudad o provincia.");
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('loading').style.display = 'none';
-                    alert("Error técnico al conectar con el servidor de direcciones.");
-                    console.error(error);
+                    } else alert("No encontrado");
                 });
         }
 
         function buscarCercanos() {
-            if (!navigator.geolocation) {
-                alert("Tu navegador no soporta geolocalización.");
-                return;
-            }
-
-            prepararBusqueda();
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
-                    
-                    map.setView([lat, lon], 13);
-                    L.marker([lat, lon]).addTo(markersGroup).bindPopup("<b>Tu posición GPS actual</b>").openPopup();
-
-                    consultarOverpass(lat, lon);
-                },
-                (error) => {
-                    document.getElementById('loading').style.display = 'none';
-                    alert("Error al obtener ubicación. Asegúrate de darle permisos al navegador.");
-                }
-            );
+            navigator.geolocation.getCurrentPosition(p => {
+                const {latitude: lat, longitude: lon} = p.coords;
+                map.setView([lat, lon], 14);
+                markers.clearLayers();
+                L.marker([lat, lon]).addTo(markers).bindPopup("Tú").openPopup();
+                consultarOverpass(lat, lon);
+            });
         }
 
-        function prepararBusqueda() {
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('results-container').innerHTML = '';
-            document.getElementById('btn-download').style.display = 'none';
-            markersGroup.clearLayers();
+        function setStatus(msg) {
+            const el = document.getElementById('loading-status');
+            el.style.display = 'block';
+            el.innerText = msg;
         }
 
         function consultarOverpass(lat, lon) {
-            // Optimización EXTREMA: Solo buscamos nodos (node) y líneas (way).
-            // El uso del punto '.' en "Protecci.n" actúa como comodín ultrarrápido para "ó" u "o".
-            const query = `
-                [out:json][timeout:25];
-                (
-                  node["amenity"="police"](around:5000,${lat},${lon});
-                  way["amenity"="police"](around:5000,${lat},${lon});
-                  
-                  node["amenity"="fire_station"](around:5000,${lat},${lon});
-                  way["amenity"="fire_station"](around:5000,${lat},${lon});
-                  
-                  node["name"~"Cruz Roja|Protecci.n Civil",i](around:5000,${lat},${lon});
-                  way["name"~"Cruz Roja|Protecci.n Civil",i](around:5000,${lat},${lon});
-                );
-                out center;
-            `;
-
-            // Servidores actualizados (Eliminamos el .ru que da Timeout y añadimos el suizo .ch)
-            const endpoints = [
-                "https://overpass-api.de/api/interpreter",         // Principal Alemán
-                "https://overpass.osm.ch/api/interpreter",         // Suizo (Muy rápido)
-                "https://overpass.kumi.systems/api/interpreter",   // Taiwán (Estable)
-                "https://lz4.overpass-api.de/api/interpreter"      // Secundario Alemán
+            const query = `[out:json][timeout:15];(node["amenity"~"police|fire_station"](around:5000,${lat},${lon});way["amenity"~"police|fire_station"](around:5000,${lat},${lon});node["name"~"Cruz Roja|Protecci.n Civil",i](around:5000,${lat},${lon}););out center;`;
+            
+            const servers = [
+                "https://overpass.osm.ch/api/interpreter", // Suizo (Más estable)
+                "https://lz4.overpass-api.de/api/interpreter", 
+                "https://overpass-api.de/api/interpreter"
             ];
 
-            let currentEndpoint = 0;
-
-            function fetchWithFallback() {
-                if (currentEndpoint >= endpoints.length) {
-                    document.getElementById('loading').style.display = 'none';
-                    alert("Aviso: Todos los servidores públicos de mapas están saturados en este momento. Por favor, inténtalo de nuevo en unos minutos.");
+            let i = 0;
+            const tryFetch = () => {
+                if(i >= servers.length) {
+                    setStatus("Error: Todos los servidores saturados. Reintenta en 1 min.");
                     return;
                 }
-
-                fetch(endpoints[currentEndpoint], {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded"
-                    },
-                    body: "data=" + encodeURIComponent(query)
+                setStatus(`Conectando a Servidor ${i+1}/${servers.length}...`);
+                
+                fetch(servers[i], {
+                    method: 'POST',
+                    body: 'data=' + encodeURIComponent(query)
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Servidor saturado (Error ${response.status})`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    procesarResultados(data.elements, lat, lon);
-                })
-                .catch(error => {
-                    console.warn(`El servidor ${endpoints[currentEndpoint]} falló. Intentando el siguiente...`, error);
-                    currentEndpoint++; 
-                    fetchWithFallback(); 
-                });
-            }
-
-            fetchWithFallback();
+                .then(r => { if(!r.ok) throw new Error(); return r.json(); })
+                .then(d => procesar(d.elements))
+                .catch(() => { i++; tryFetch(); });
+            };
+            tryFetch();
         }
 
-        function procesarResultados(elementos, userLat, userLon) {
-            document.getElementById('loading').style.display = 'none';
-            const container = document.getElementById('results-container');
-            resultadosGlobales = []; 
-
-            if (elementos.length === 0) {
-                container.innerHTML = '<p>No se encontraron recursos de emergencia en un radio de 5km.</p>';
-                return;
-            }
-
-            elementos.forEach(el => {
-                const elLat = el.lat || el.center.lat;
-                const elLon = el.lon || el.center.lon;
-                
-                let tipo = "Recurso de Emergencia";
-                if (el.tags.amenity === "police") tipo = "Policía";
-                if (el.tags.amenity === "fire_station") tipo = "Bomberos";
-                if (el.tags.name && (el.tags.name.includes("Cruz") || el.tags.name.includes("Protección"))) tipo = "Voluntariado / Sanidad";
-
-                const nombre = el.tags.name || `${tipo} (Sin nombre específico)`;
-                const direccion = el.tags["addr:street"] 
-                    ? `${el.tags["addr:street"]} ${el.tags["addr:housenumber"] || ''}` 
-                    : "Dirección exacta no registrada";
-                
-                const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=LAT,LON0{elLat},${elLon}`;
-
-                resultadosGlobales.push(`TIPO: ${tipo}\nNOMBRE: ${nombre}\nDIRECCIÓN: ${direccion}\nCOORDENADAS: ${elLat}, ${elLon}\nENLACE GPS: ${googleMapsUrl}\n------------------------\n`);
-
-                L.marker([elLat, elLon]).addTo(markersGroup)
-                    .bindPopup(`<b>${nombre}</b><br>${tipo}`);
-
-                const html = `
-                    <div class="result-item">
-                        <div class="result-info">
-                            <h3>${nombre}</h3>
-                            <p><strong>Tipo:</strong> ${tipo}</p>
-                            <p><strong>Ubicación:</strong> ${direccion}</p>
-                        </div>
-                        <a href="${googleMapsUrl}" target="_blank" class="btn-navigate">🧭 Cómo llegar</a>
-                    </div>
-                `;
-                container.innerHTML += html;
+        function procesar(els) {
+            document.getElementById('loading-status').style.display = 'none';
+            const res = document.getElementById('results-container');
+            res.innerHTML = "";
+            if(els.length === 0) return res.innerHTML = "No se hallaron recursos en 5km.";
+            
+            els.forEach(e => {
+                const l = e.lat || e.center.lat, o = e.lon || e.center.lon;
+                const n = e.tags.name || e.tags.amenity || "Recurso";
+                L.marker([l, o]).addTo(markers).bindPopup(n);
+                res.innerHTML += `<div class="result-item"><div><strong>${n}</strong></div><a href="https://www.google.com/maps/dir/?api=1&destination=${l},${o}" target="_blank" class="btn" style="width:auto">Ir</a></div>`;
             });
-
-            map.fitBounds(markersGroup.getBounds().pad(0.1));
             document.getElementById('btn-download').style.display = 'block';
         }
 
-        function descargarResultados() {
-            if (resultadosGlobales.length === 0) return;
+        // Timer 333
+        setInterval(() => {
+            const now = new Date();
+            const h = now.getHours();
+            let next = h + (3 - (h % 3));
+            if(h % 3 === 0 && now.getMinutes() < 3) {
+                document.getElementById('countdown').innerText = "VENTANA ACTIVA";
+                return;
+            }
+            if(next >= 24) next = 0;
+            document.getElementById('next-window-text').innerText = `Siguiente: ${next}:00`;
+        }, 1000);
 
-            const encabezado = "=== PLAN DE EMERGENCIA: RECURSOS CERCANOS ===\n(Guarda este archivo en tu teléfono para consultarlo sin internet)\n\n";
-            const contenido = encabezado + resultadosGlobales.join("");
-            
-            const blob = new Blob([contenido], { type: 'text/plain;charset=utf-8' });
-            
-            const a = document.createElement('a');
-            const url = URL.createObjectURL(blob);
-            a.href = url;
-            a.download = 'Recursos_Emergencia_Offline.txt';
-            document.body.appendChild(a);
-            a.click();
-            
-            setTimeout(() => {
-                document.body.removeChild(a);
-                window.URL.revokeObjectURL(url);
-            }, 0);
+        // PWA Registration
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js').then(() => console.log("PWA OK"));
         }
     </script>
 </body>
