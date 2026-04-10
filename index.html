@@ -703,7 +703,7 @@
                 <h2>👨 Adultos (>8 años)</h2>
                 <div class="emergency-card"><strong>Hecho:</strong> Para no entrenados, RCP "Solo manos". Ventilar retrasa las compresiones si no sabes.</div>
                 <div class="graphic-container">
-                    <img src="rcp adultos.jpg" alt="RCP Adultos" onerror="this.style.display='none'">
+                    <img src="rcp-adultos.jpg" alt="RCP Adultos" onerror="this.style.display='none'">
                 </div>
                 <ol>
                     <li>Boca arriba sobre superficie <strong>dura</strong>.</li>
@@ -715,7 +715,7 @@
             <div class="card">
                 <h2>👦 Niños (1 a 8 años)</h2>
                 <div class="graphic-container">
-                    <img src="rcp niños.jpg" alt="RCP Niños" onerror="this.style.display='none'">
+                    <img src="rcp-ninos.jpg" alt="RCP Niños" onerror="this.style.display='none'">
                 </div>
                 <ol>
                     <li>Abrir vía aérea y dar <strong>5 ventilaciones iniciales</strong>.</li>
@@ -727,7 +727,7 @@
             <div class="card">
                 <h2>👶 Bebés (<1 año)</h2>
                 <div class="graphic-container">
-                    <img src="rcp bebes.jpg" alt="RCP Bebés" onerror="this.style.display='none'">
+                    <img src="rcp-bebes.jpg" alt="RCP Bebés" onerror="this.style.display='none'">
                 </div>
                 <ol>
                     <li><strong>5 ventilaciones:</strong> Boca cubre nariz y boca del bebé. Soplos muy suaves.</li>
@@ -747,7 +747,7 @@
             <div class="card">
                 <h2>👨 Adulto / 👦 Niño (No puede toser ni hablar)</h2>
                 <div class="graphic-container">
-                    <img src="atragantamiento adultos y niños.jpg" alt="Atragantamiento General" onerror="this.style.display='none'">
+                    <img src="atragantamiento-adultos-ninos.jpg" alt="Atragantamiento General" onerror="this.style.display='none'">
                 </div>
                 <ol>
                     <li><strong>5 golpes secos</strong> en la espalda (entre omóplatos).</li>
@@ -760,7 +760,7 @@
                 <h2>👶 Bebés (<1 año)</h2>
                 <div class="baby-warning">NUNCA compresiones abdominales (Heimlich) en bebés. Podrías destrozar sus órganos internos.</div>
                 <div class="graphic-container">
-                    <img src="atragantamiento bebes.jpg" alt="Atragantamiento Bebés" onerror="this.style.display='none'">
+                    <img src="atragantamiento-bebes.jpg" alt="Atragantamiento Bebés" onerror="this.style.display='none'">
                 </div>
                 <ol>
                     <li>Bebé boca abajo en tu antebrazo. Da <strong>5 golpes secos</strong> en espalda.</li>
@@ -1047,7 +1047,7 @@
                     ? `${el.tags["addr:street"]} ${el.tags["addr:housenumber"] || ''}` 
                     : "Dirección exacta no registrada";
                 
-                const googleMapsUrl = `http://googleusercontent.com/maps.google.com/7{elLat},${elLon}`;
+                const googleMapsUrl = `http://googleusercontent.com/maps.google.com/8{elLat},${elLon}`;
 
                 resultadosGlobales.push(`TIPO: ${tipo}\nNOMBRE: ${nombre}\nDIRECCIÓN: ${direccion}\nCOORDENADAS: ${elLat}, ${elLon}\nENLACE GPS: ${googleMapsUrl}\n------------------------\n`);
 
