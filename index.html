@@ -220,7 +220,7 @@
             text-align: center;
             margin-bottom: 1rem;
         }
-        .back-btn { background-color: #607d8b; margin-bottom: 1rem; width: auto; }
+        .back-btn { background-color: #607d8b; margin-bottom: 1rem; width: auto; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 4px; cursor: pointer; font-weight: bold; display: inline-block;}
 
         /* Estilos Plan 333 */
         .status-panel-333 {
@@ -911,7 +911,7 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // --- 4. LÓGICA DEL MAPA TÁCTICO (LEAFLET + OVERPASS + FALLBACK) ---
+        // --- 4. LÓGICA DEL MAPA TÁCTICO (LEAFLET + OVERPASS POST + FALLBACKS) ---
         let map;
         let markersGroup;
         let resultadosGlobales = []; 
@@ -995,27 +995,20 @@
 
         function consultarOverpass(lat, lon) {
             const query = `
-                [out:json][timeout:25];
+                [out:json][timeout:15];
                 (
-                  node["amenity"="police"](around:5000,${lat},${lon});
-                  way["amenity"="police"](around:5000,${lat},${lon});
-                  
-                  node["amenity"="fire_station"](around:5000,${lat},${lon});
-                  way["amenity"="fire_station"](around:5000,${lat},${lon});
-                  
-                  node["name"~"Cruz Roja|Protección Civil",i](around:5000,${lat},${lon});
-                  way["name"~"Cruz Roja|Protección Civil",i](around:5000,${lat},${lon});
+                  nwr(around:5000,${lat},${lon})["amenity"="police"];
+                  nwr(around:5000,${lat},${lon})["amenity"="fire_station"];
+                  nwr(around:5000,${lat},${lon})["name"~"Cruz Roja|Protección Civil|Proteccion Civil",i];
                 );
                 out center;
             `;
 
-            const encodedQuery = encodeURIComponent(query);
-            
-            // Sistema de redundancia: 3 servidores distintos de mapas por si uno se cae (Evita el error 504)
             const endpoints = [
-                `https://overpass-api.de/api/interpreter?data=${encodedQuery}`,
-                `https://lz4.overpass-api.de/api/interpreter?data=${encodedQuery}`,
-                `https://overpass.kumi.systems/api/interpreter?data=${encodedQuery}`
+                "https://overpass-api.de/api/interpreter",
+                "https://lz4.overpass-api.de/api/interpreter",
+                "https://overpass.kumi.systems/api/interpreter",
+                "https://overpass.openstreetmap.ru/api/interpreter"
             ];
 
             let currentEndpoint = 0;
@@ -1023,25 +1016,31 @@
             function fetchWithFallback() {
                 if (currentEndpoint >= endpoints.length) {
                     document.getElementById('loading').style.display = 'none';
-                    alert("Aviso: Todos los servidores públicos de mapas están saturados en este momento. Por favor, inténtalo de nuevo en unos minutos.");
+                    alert("Aviso: Todos los servidores públicos de mapas están saturados. Por favor, inténtalo de nuevo en unos minutos.");
                     return;
                 }
 
-                fetch(endpoints[currentEndpoint])
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Servidor saturado (Error ${response.status})`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        procesarResultados(data.elements, lat, lon);
-                    })
-                    .catch(error => {
-                        console.warn(`El servidor ${endpoints[currentEndpoint]} ha fallado. Saltando al siguiente servidor de emergencia...`, error);
-                        currentEndpoint++; 
-                        fetchWithFallback(); 
-                    });
+                fetch(endpoints[currentEndpoint], {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: "data=" + encodeURIComponent(query)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Servidor saturado (Error ${response.status})`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    procesarResultados(data.elements, lat, lon);
+                })
+                .catch(error => {
+                    console.warn(`El servidor ${endpoints[currentEndpoint]} falló. Intentando el siguiente...`, error);
+                    currentEndpoint++; 
+                    fetchWithFallback(); 
+                });
             }
 
             fetchWithFallback();
@@ -1071,7 +1070,7 @@
                     ? `${el.tags["addr:street"]} ${el.tags["addr:housenumber"] || ''}` 
                     : "Dirección exacta no registrada";
                 
-                const googleMapsUrl = `http://googleusercontent.com/maps.google.com/9{elLat},${elLon}`;
+                const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=LAT,LON0{elLat},${elLon}`;
 
                 resultadosGlobales.push(`TIPO: ${tipo}\nNOMBRE: ${nombre}\nDIRECCIÓN: ${direccion}\nCOORDENADAS: ${elLat}, ${elLon}\nENLACE GPS: ${googleMapsUrl}\n------------------------\n`);
 
