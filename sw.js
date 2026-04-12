@@ -1,7 +1,8 @@
-const CACHE_NAME = 'emergencias-cache-v3'; 
+const CACHE_NAME = 'emergencias-cache-v5'; 
 const urlsToCache = [
-  './index.html',
+  './INDEX.HTML',
   './manifest.json',
+  './image_81972a.png',
   './mochila.jpg',
   './rcp-adultos.jpg',
   './rcp-ninos.jpg',
@@ -12,11 +13,22 @@ const urlsToCache = [
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Archivos cacheados correctamente');
-        return cache.addAll(urlsToCache);
-      })
+    caches.open(CACHE_NAME).then(async (cache) => {
+      console.log('Iniciando caché de archivos...');
+      for (let url of urlsToCache) {
+        try {
+          const request = new Request(url, { cache: 'reload' });
+          const response = await fetch(request);
+          if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+          }
+          await cache.put(request, response);
+          console.log(`✅ Guardado en caché: ${url}`);
+        } catch (error) {
+          console.error(`❌ FALLO FATAL AL CACHEAR: ${url} - Revisa que este archivo exista en GitHub y esté bien escrito.`);
+        }
+      }
+    })
   );
 });
 
