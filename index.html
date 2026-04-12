@@ -25,6 +25,24 @@
             --alert-text: #000000;
         }
 
+        /* --- MODO OSCURO (AÑADIDO) --- */
+        body.dark-mode {
+            --light-bg: #121212;
+            --text-color: #e0e0e0;
+            --white: #1e1e1e;
+            --alert-bg: #333300;
+            --alert-text: #ffeb3b;
+            --dark-color: #000000;
+        }
+        body.dark-mode .card, body.dark-mode .portal-card, body.dark-mode .progress-container {
+            border: 1px solid #333;
+        }
+        body.dark-mode .emergency-card { background-color: #333300; color: #ffeb3b; border-left-color: #f57c00; }
+        body.dark-mode .item.checked { background-color: #1a2e1a; }
+        body.dark-mode .classic-footer { background-color: #111; color: #888; }
+        body.dark-mode .pas-protocol { background-color: #1e1e1e; }
+        /* ----------------------------- */
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
@@ -32,29 +50,44 @@
             padding: 0;
             background-color: var(--light-bg);
             color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
         }
 
         .page-section { display: none; animation: fadeIn 0.3s; }
         .page-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
+        /* NUEVO MENÚ DESPLEGABLE */
         .navbar {
-            display: flex; justify-content: center; flex-wrap: wrap;
-            background-color: var(--dark-color); padding: 1rem;
+            display: flex; justify-content: space-between; align-items: center;
+            background-color: var(--dark-color); padding: 0.8rem 1rem;
             position: sticky; top: 0; z-index: 1000;
         }
-        .navbar button {
-            background: none; border: none; color: white;
-            padding: 0.5rem 1rem; font-weight: bold; font-size: 0.95rem;
-            cursor: pointer; transition: color 0.3s;
+        
+        .nav-brand { color: white; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; gap: 8px;}
+        .nav-controls { display: flex; align-items: center; gap: 10px; }
+        
+        .navbar button { background: none; border: none; color: white; cursor: pointer; transition: color 0.3s; }
+        
+        .dropdown { position: relative; display: inline-block; }
+        .dropdown-content {
+            display: none; position: absolute; right: 0; top: 120%;
+            background-color: var(--dark-color); min-width: 220px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5); z-index: 1001;
+            border-radius: 6px; overflow: hidden;
         }
-        .navbar button:hover, .navbar button.active-nav { color: var(--primary-color); }
+        .dropdown-content button {
+            color: white; padding: 14px 16px; text-decoration: none;
+            display: block; width: 100%; text-align: left; font-weight: bold;
+            border-bottom: 1px solid rgba(255,255,255,0.1); border-radius: 0; font-size: 0.95rem;
+        }
+        .dropdown-content button:last-child { border-bottom: none; }
+        .dropdown-content button:hover, .dropdown-content button.active-nav { background-color: rgba(255,255,255,0.15); color: var(--primary-color); }
+        .show-dropdown { display: block; }
 
-        .alert-banner {
-            background-color: var(--alert-bg); color: var(--alert-text);
-            text-align: center; padding: 1rem; font-weight: bold;
-            font-size: 1.1rem; border-bottom: 3px solid #fbc02d;
-        }
+        .btn-install { background-color: var(--secondary-color) !important; padding: 0.4rem 0.8rem !important; border-radius: 4px; font-size: 0.9rem !important; font-weight: bold; display: none; }
+
+        .alert-banner { background-color: var(--alert-bg); color: var(--alert-text); text-align: center; padding: 1rem; font-weight: bold; font-size: 1.1rem; border-bottom: 3px solid #fbc02d; }
         .info-banner { background-color: var(--accent-color); color: var(--white); text-align: center; padding: 0.8rem; font-weight: bold; font-size: 0.95rem; }
         .number-112 { font-size: 1.5rem; font-weight: bold; color: var(--primary-color); background-color: var(--white); padding: 0.2rem 0.5rem; border-radius: 4px; border: 2px solid var(--primary-color); }
         
@@ -67,7 +100,7 @@
 
         .portal-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem; }
         .portal-card {
-            background-color: #fff; padding: 2rem; border-radius: 8px;
+            background-color: var(--white); padding: 2rem; border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center;
             border: 2px solid transparent; transition: border-color 0.3s, transform 0.3s;
             cursor: pointer; display: flex; flex-direction: column; justify-content: space-between;
@@ -93,8 +126,8 @@
 
         /* P. Auxilios & 333 Styles */
         .pas-protocol { border-left: 5px solid var(--primary-color); }
-        .emergency-card { background-color: #fff9c4; border-left: 4px solid #fbc02d; padding: 1rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; }
-        .baby-warning { background-color: #ffcccc; border: 2px solid var(--primary-color); padding: 1rem; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 1rem; }
+        .emergency-card { background-color: #fff9c4; border-left: 4px solid #fbc02d; padding: 1rem; margin: 1.5rem 0; border-radius: 0 4px 4px 0; color: black; }
+        .baby-warning { background-color: #ffcccc; border: 2px solid var(--primary-color); padding: 1rem; border-radius: 8px; font-weight: bold; text-align: center; margin-bottom: 1rem; color: black;}
         .back-btn { background-color: #607d8b; margin-bottom: 1rem; width: auto; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 4px; cursor: pointer; font-weight: bold; display: inline-block;}
         .status-panel-333 { background: linear-gradient(135deg, var(--white), #fff3e0); border: 2px solid var(--accent-color); text-align: center; }
         .timer-333 { font-size: 2.5rem; font-weight: 900; color: var(--primary-color); font-family: monospace; margin: 0.5rem 0; }
@@ -104,7 +137,7 @@
 
         .classic-footer { text-align: center; padding: 2rem; background-color: #ddd; color: var(--dark-color); margin-top: 2rem; }
 
-        /* NUEVOS ESTILOS DEL MAPA (Añadidos) */
+        /* ESTILOS DEL MAPA TAILWIND */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         #map { height: 500px; z-index: 1; }
         .pulse-ring { animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
@@ -117,17 +150,31 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); }
         .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
-        .leaflet-popup-content-wrapper { border-radius: 12px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important; }
+        .leaflet-popup-content-wrapper { border-radius: 12px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important; color: black; }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
-        <button onclick="navigate('inicio')" id="nav-inicio" class="active-nav">INICIO</button>
-        <button onclick="navigate('mochila')" id="nav-mochila">MOCHILA 72H</button>
-        <button onclick="navigate('plan333')" id="nav-plan333">PLAN 333 RADIO</button>
-        <button onclick="navigate('mapa')" id="nav-mapa">MAPA TÁCTICO</button>
-        <button onclick="navigate('paux')" id="nav-paux">PRIMEROS AUXILIOS</button>
+        <div class="nav-brand">
+            <span>🚨</span> Portal Táctico
+        </div>
+        <div class="nav-controls">
+            <button id="install-btn" class="btn-install">📲 Instalar</button>
+            
+            <button id="dark-mode-toggle" style="font-size: 1.3rem; padding: 0.2rem;">🌙</button>
+            
+            <div class="dropdown">
+                <button id="dropdown-toggle" style="font-size: 1.6rem; padding: 0.1rem 0.5rem; margin-left: 5px;">☰</button>
+                <div id="dropdown-menu" class="dropdown-content">
+                    <button onclick="navigate('inicio')" id="nav-inicio" class="active-nav">🏠 INICIO</button>
+                    <button onclick="navigate('mochila')" id="nav-mochila">🎒 MOCHILA 72H</button>
+                    <button onclick="navigate('plan333')" id="nav-plan333">📻 PLAN 333 RADIO</button>
+                    <button onclick="navigate('mapa')" id="nav-mapa">🗺️ MAPA TÁCTICO</button>
+                    <button onclick="navigate('paux')" id="nav-paux">🩹 PRIMEROS AUXILIOS</button>
+                </div>
+            </div>
+        </div>
     </nav>
 
     <div class="alert-banner">
@@ -163,7 +210,7 @@
                         <h2>Mapa Táctico</h2>
                         <p>Buscador de Policía, Bomberos y Protección Civil en un radio de 2km.</p>
                     </div>
-                    <button class="btn-classic" style="background-color: var(--dark-color);">ABRIR MAPA</button>
+                    <button class="btn-classic" style="background-color: var(--secondary-color);">ABRIR MAPA</button>
                 </div>
                 <div class="portal-card" onclick="navigate('paux')">
                     <div>
@@ -680,47 +727,84 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
     <script>
-        // --- 0. REGISTRO DEL SERVICE WORKER (PWA) ---
+        // --- 0. REGISTRO DEL SERVICE WORKER (PWA) E INSTALACIÓN ---
+        let deferredPrompt;
+        const installBtn = document.getElementById('install-btn');
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registrado con éxito (Modo Offline Activado).');
-                    })
-                    .catch(error => {
-                        console.log('Fallo al registrar el ServiceWorker:', error);
-                    });
+                    .then(registration => console.log('ServiceWorker registrado con éxito.'))
+                    .catch(error => console.log('Fallo al registrar el ServiceWorker:', error));
             });
         }
 
-        // --- 1. LÓGICA DE NAVEGACIÓN SPA ---
+        // Mostrar botón de instalación cuando el navegador lo permita
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block';
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            }
+        });
+
+        // --- 1. LÓGICA DE NAVEGACIÓN Y MENÚ DESPLEGABLE ---
+        const dropdownToggle = document.getElementById('dropdown-toggle');
+        const dropdownMenu = document.getElementById('dropdown-menu');
+
+        dropdownToggle.addEventListener('click', () => {
+            dropdownMenu.classList.toggle('show-dropdown');
+        });
+
+        // Cerrar menú al hacer clic fuera
+        window.addEventListener('click', (e) => {
+            if (!e.target.matches('#dropdown-toggle') && !e.target.closest('.dropdown')) {
+                dropdownMenu.classList.remove('show-dropdown');
+            }
+        });
+
         function navigate(sectionId) {
-            document.querySelectorAll('.page-section').forEach(sec => {
-                sec.classList.remove('active');
-            });
-            
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
             
-            document.querySelectorAll('.navbar button').forEach(btn => {
-                btn.classList.remove('active-nav');
-            });
-            
+            document.querySelectorAll('.dropdown-content button').forEach(btn => btn.classList.remove('active-nav'));
             let navBtn = document.getElementById('nav-' + sectionId);
-            if(navBtn) {
-                navBtn.classList.add('active-nav');
-            } else if (sectionId === 'rcp' || sectionId === 'atragantamiento') {
-                document.getElementById('nav-paux').classList.add('active-nav');
-            }
+            if(navBtn) navBtn.classList.add('active-nav');
+            else if (sectionId === 'rcp' || sectionId === 'atragantamiento') document.getElementById('nav-paux').classList.add('active-nav');
 
-            // Recarga obligatoria del mapa para evitar fallos de renderizado al mostrar su pestaña
+            dropdownMenu.classList.remove('show-dropdown'); // Cerrar el menú al seleccionar
+
             if (sectionId === 'mapa' && map) {
-                setTimeout(() => {
-                    map.invalidateSize();
-                }, 300);
+                setTimeout(() => map.invalidateSize(), 300);
             }
 
             window.scrollTo(0, 0);
         }
+
+        // --- MODO OSCURO (DARK MODE) ---
+        const darkModeToggle = document.getElementById('dark-mode-toggle');
+        const isDark = localStorage.getItem('darkMode') === 'true';
+        
+        if (isDark) {
+            document.body.classList.add('dark-mode');
+            darkModeToggle.innerText = '☀️';
+        }
+
+        darkModeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const darkActive = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', darkActive);
+            darkModeToggle.innerText = darkActive ? '☀️' : '🌙';
+        });
 
         // --- 2. LÓGICA CHECKLIST MOCHILA ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -817,7 +901,7 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // --- 4. LÓGICA DEL NUEVO MAPA TAILWIND ---
+        // --- 4. LÓGICA DEL MAPA TÁCTICO TAILWIND ---
         let map = null;
         let markersLayer = null;
         let circleLayer = null;
@@ -868,7 +952,7 @@
         }
 
         function getMyLocation() {
-            if (!navigator.geolocation) { showError('Tu navegador no soporta geolocalización. Usa la búsqueda por dirección.'); return; }
+            if (!navigator.geolocation) { showError('Tu navegador no soporta geolocalización.'); return; }
             const btn = document.getElementById('btnLocation');
             const spinner = document.getElementById('locSpinner');
             const locText = document.getElementById('locText');
@@ -886,7 +970,7 @@
                 (error) => {
                     spinner.classList.add('hidden'); locIcon.classList.remove('hidden'); locText.textContent = 'Compartir mi ubicación'; btn.disabled = false;
                     let msg = 'Error al obtener ubicación.';
-                    if(error.code === 1) msg = 'Permiso denegado. Habilítalo o usa la búsqueda manual.';
+                    if(error.code === 1) msg = 'Permiso denegado. Usa la búsqueda manual.';
                     showError(msg);
                 },
                 { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
@@ -912,13 +996,13 @@
                 updateStatus(`📍 ${displayName}`, `${currentLat.toFixed(5)}, ${currentLng.toFixed(5)}`);
                 searchEmergencies(currentLat, currentLng);
             } catch (err) {
-                showError('Error al buscar la dirección. Verifica tu conexión.');
+                showError('Error al buscar la dirección.');
             }
             btn.disabled = false; btn.innerHTML = '🔍 Buscar';
         }
 
         async function searchEmergencies(lat, lng) {
-            const radius = 2000; // 2 km
+            const radius = 2000;
             showMap(lat, lng, radius);
 
             document.getElementById('statsBar').classList.remove('hidden');
@@ -980,7 +1064,7 @@
 
             if (!map) {
                 map = L.map('map', { zoomControl: true, attributionControl: true });
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap contributors', maxZoom: 19 }).addTo(map);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(map);
                 markersLayer = L.layerGroup().addTo(map);
             }
 
