@@ -8,14 +8,14 @@
   "description": "Protocolos offline para escenarios Grid-Down.",
   "icons": [
     {
-      "src": "mochila.jpg",
+      "src": "image_81972a.png",
       "sizes": "192x192",
-      "type": "image/jpeg"
+      "type": "image/png"
     },
     {
-      "src": "mochila.jpg",
+      "src": "image_81972a.png",
       "sizes": "512x512",
-      "type": "image/jpeg"
+      "type": "image/png"
     }
   ]
 }
