@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
     <style>
-        /* ESTILOS ORIGINALES (Mantenidos) */
+        /* ESTILOS ORIGINALES */
         :root {
             --primary-color: #d32f2f;
             --secondary-color: #1976d2;
@@ -25,7 +25,7 @@
             --alert-text: #000000;
         }
 
-        /* --- MODO OSCURO (AÑADIDO) --- */
+        /* --- MODO OSCURO --- */
         body.dark-mode {
             --light-bg: #121212;
             --text-color: #e0e0e0;
@@ -57,7 +57,7 @@
         .page-section.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* NUEVO MENÚ DESPLEGABLE */
+        /* MENÚ DESPLEGABLE */
         .navbar {
             display: flex; justify-content: space-between; align-items: center;
             background-color: var(--dark-color); padding: 0.8rem 1rem;
@@ -151,6 +151,43 @@
         .gradient-bg { background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%); }
         .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
         .leaflet-popup-content-wrapper { border-radius: 12px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important; color: black; }
+
+        /* --- RESPONSIVE DESIGN (ADAPTACIÓN A MÓVILES Y TABLETS) --- */
+        @media (max-width: 768px) {
+            .classic-header h1 { font-size: 1.6rem; }
+            .container { margin: 1rem auto; padding: 0 0.8rem; }
+            
+            /* Ajuste de tarjetas en móviles */
+            .portal-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .portal-card { padding: 1.5rem; }
+            .card { padding: 1rem; margin-bottom: 1rem; }
+            
+            /* Ajustes Mapa Tailwind en móvil */
+            .text-4xl { font-size: 2rem !important; line-height: 2.5rem !important; }
+            .text-5xl { font-size: 2.5rem !important; }
+            #map { height: 350px; }
+            .flex-1.py-3.px-4 { padding: 0.8rem !important; font-size: 0.85rem !important; }
+            .bg-gradient-to-r.py-4.px-8 { padding: 1rem !important; width: 100%; font-size: 1rem !important; }
+            
+            /* Ajustes Barra Superior */
+            .nav-brand { font-size: 1rem; }
+            .dropdown-content { right: -10px; width: 100vw; max-width: 300px; }
+            
+            /* Ajustes Plan 333 */
+            .timer-333 { font-size: 2rem; }
+            .rule-grid { grid-template-columns: 1fr; }
+            
+            /* Ajustes Lista Mochila */
+            .item { flex-direction: column; }
+            input[type="checkbox"] { margin-bottom: 0.5rem; }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            /* Ajustes para Tablets */
+            .portal-grid { grid-template-columns: repeat(2, 1fr); }
+            #map { height: 400px; }
+        }
+        /* ----------------------------------------------------------- */
     </style>
 </head>
 <body>
@@ -161,9 +198,7 @@
         </div>
         <div class="nav-controls">
             <button id="install-btn" class="btn-install">📲 Instalar</button>
-            
             <button id="dark-mode-toggle" style="font-size: 1.3rem; padding: 0.2rem;">🌙</button>
-            
             <div class="dropdown">
                 <button id="dropdown-toggle" style="font-size: 1.6rem; padding: 0.1rem 0.5rem; margin-left: 5px;">☰</button>
                 <div id="dropdown-menu" class="dropdown-content">
@@ -1093,7 +1128,7 @@
             const phoneText = phone !== 'No disponible' ? `<br>📞 <a href="tel:${phone}" style="color:${color}">${phone}</a>` : '';
 
             L.marker([lat, lng], { icon: markerIcon }).addTo(markersLayer)
-                .bindPopup(`<div style="min-width:180px;font-family:Inter,sans-serif;"><div style="font-size:16px;font-weight:700;margin-bottom:4px;color:black;">${emoji} ${name}</div><div style="font-size:12px;color:#6b7280;margin-bottom:6px;">${category}</div><div style="font-size:12px;color:#6b7280;">📏 ${distText}${phoneText}</div><div style="margin-top:8px;"><a href="https://www.google.com/maps/dir/?api=1&destination=$${lat},${lng}" target="_blank" style="display:inline-block;background:${color};color:white;padding:6px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600;">🧭 Cómo llegar</a></div></div>`);
+                .bindPopup(`<div style="min-width:180px;font-family:Inter,sans-serif;"><div style="font-size:16px;font-weight:700;margin-bottom:4px;color:black;">${emoji} ${name}</div><div style="font-size:12px;color:#6b7280;margin-bottom:6px;">${category}</div><div style="font-size:12px;color:#6b7280;">📏 ${distText}${phoneText}</div><div style="margin-top:8px;"><a href="http://googleusercontent.com/maps.google.com/3{lat},${lng}" target="_blank" style="display:inline-block;background:${color};color:white;padding:6px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600;">🧭 Cómo llegar</a></div></div>`);
         }
 
         function renderResults(results) {
@@ -1122,7 +1157,7 @@
                                 ${r.phone !== 'No disponible' ? `<a href="tel:${r.phone}" class="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1" style="text-decoration:none;">📞 ${r.phone}</a>` : ''}
                                 ${r.website ? `<a href="${r.website}" target="_blank" class="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1" style="text-decoration:none;">🌐 Web</a>` : ''}
                             </div>
-                            <a href="https://www.google.com/maps/dir/?api=1&destination=$${r.lat},${r.lng}" target="_blank" class="inline-flex items-center gap-1 mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all" style="background:${r.color}20;color:${r.color};text-decoration:none;">🧭 Cómo llegar</a>
+                            <a href="http://googleusercontent.com/maps.google.com/3{r.lat},${r.lng}" target="_blank" class="inline-flex items-center gap-1 mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all" style="background:${r.color}20;color:${r.color};text-decoration:none;">🧭 Cómo llegar</a>
                         </div>
                     </div>
                 `;
