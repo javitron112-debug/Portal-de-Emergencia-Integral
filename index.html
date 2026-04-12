@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 
     <style>
-        /* ESTILOS ORIGINALES */
+        /* ESTILOS ORIGINALES (Mantenidos) */
         :root {
             --primary-color: #d32f2f;
             --secondary-color: #1976d2;
@@ -152,42 +152,35 @@
         .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
         .leaflet-popup-content-wrapper { border-radius: 12px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.2) !important; color: black; }
 
-        /* --- RESPONSIVE DESIGN (ADAPTACIÓN A MÓVILES Y TABLETS) --- */
+        /* --- RESPONSIVE DESIGN --- */
         @media (max-width: 768px) {
             .classic-header h1 { font-size: 1.6rem; }
             .container { margin: 1rem auto; padding: 0 0.8rem; }
             
-            /* Ajuste de tarjetas en móviles */
             .portal-grid { grid-template-columns: 1fr; gap: 1rem; }
             .portal-card { padding: 1.5rem; }
             .card { padding: 1rem; margin-bottom: 1rem; }
             
-            /* Ajustes Mapa Tailwind en móvil */
             .text-4xl { font-size: 2rem !important; line-height: 2.5rem !important; }
             .text-5xl { font-size: 2.5rem !important; }
             #map { height: 350px; }
             .flex-1.py-3.px-4 { padding: 0.8rem !important; font-size: 0.85rem !important; }
             .bg-gradient-to-r.py-4.px-8 { padding: 1rem !important; width: 100%; font-size: 1rem !important; }
             
-            /* Ajustes Barra Superior */
             .nav-brand { font-size: 1rem; }
             .dropdown-content { right: -10px; width: 100vw; max-width: 300px; }
             
-            /* Ajustes Plan 333 */
             .timer-333 { font-size: 2rem; }
             .rule-grid { grid-template-columns: 1fr; }
             
-            /* Ajustes Lista Mochila */
             .item { flex-direction: column; }
             input[type="checkbox"] { margin-bottom: 0.5rem; }
         }
 
         @media (min-width: 769px) and (max-width: 1024px) {
-            /* Ajustes para Tablets */
             .portal-grid { grid-template-columns: repeat(2, 1fr); }
             #map { height: 400px; }
         }
-        /* ----------------------------------------------------------- */
     </style>
 </head>
 <body>
@@ -774,7 +767,6 @@
             });
         }
 
-        // Mostrar botón de instalación cuando el navegador lo permita
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -800,7 +792,6 @@
             dropdownMenu.classList.toggle('show-dropdown');
         });
 
-        // Cerrar menú al hacer clic fuera
         window.addEventListener('click', (e) => {
             if (!e.target.matches('#dropdown-toggle') && !e.target.closest('.dropdown')) {
                 dropdownMenu.classList.remove('show-dropdown');
@@ -816,7 +807,7 @@
             if(navBtn) navBtn.classList.add('active-nav');
             else if (sectionId === 'rcp' || sectionId === 'atragantamiento') document.getElementById('nav-paux').classList.add('active-nav');
 
-            dropdownMenu.classList.remove('show-dropdown'); // Cerrar el menú al seleccionar
+            dropdownMenu.classList.remove('show-dropdown');
 
             if (sectionId === 'mapa' && map) {
                 setTimeout(() => map.invalidateSize(), 300);
@@ -1127,8 +1118,9 @@
             const distText = distance < 1 ? `${(distance * 1000).toFixed(0)}m` : `${distance.toFixed(2)} km`;
             const phoneText = phone !== 'No disponible' ? `<br>📞 <a href="tel:${phone}" style="color:${color}">${phone}</a>` : '';
 
+            // LA CORRECCIÓN ESTÁ AQUÍ (Línea 882): He eliminado el "3" que sobraba antes de {lat}
             L.marker([lat, lng], { icon: markerIcon }).addTo(markersLayer)
-                .bindPopup(`<div style="min-width:180px;font-family:Inter,sans-serif;"><div style="font-size:16px;font-weight:700;margin-bottom:4px;color:black;">${emoji} ${name}</div><div style="font-size:12px;color:#6b7280;margin-bottom:6px;">${category}</div><div style="font-size:12px;color:#6b7280;">📏 ${distText}${phoneText}</div><div style="margin-top:8px;"><a href="http://googleusercontent.com/maps.google.com/3{lat},${lng}" target="_blank" style="display:inline-block;background:${color};color:white;padding:6px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600;">🧭 Cómo llegar</a></div></div>`);
+                .bindPopup(`<div style="min-width:180px;font-family:Inter,sans-serif;"><div style="font-size:16px;font-weight:700;margin-bottom:4px;color:black;">${emoji} ${name}</div><div style="font-size:12px;color:#6b7280;margin-bottom:6px;">${category}</div><div style="font-size:12px;color:#6b7280;">📏 ${distText}${phoneText}</div><div style="margin-top:8px;"><a href="http://googleusercontent.com/maps.google.com/${lat},${lng}" target="_blank" style="display:inline-block;background:${color};color:white;padding:6px 14px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600;">🧭 Cómo llegar</a></div></div>`);
         }
 
         function renderResults(results) {
@@ -1143,6 +1135,8 @@
                 const card = document.createElement('div');
                 card.className = 'glass rounded-xl p-4 card-hover fade-in';
                 card.style.animationDelay = `${i * 0.05}s`;
+                
+                // LA CORRECCIÓN ESTÁ AQUÍ (Línea 909): He eliminado el "3" que sobraba antes de {r.lat}
                 card.innerHTML = `
                     <div class="flex items-start gap-4">
                         <div class="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center text-2xl" style="background:${r.color}20;">${r.icon}</div>
@@ -1157,7 +1151,7 @@
                                 ${r.phone !== 'No disponible' ? `<a href="tel:${r.phone}" class="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1" style="text-decoration:none;">📞 ${r.phone}</a>` : ''}
                                 ${r.website ? `<a href="${r.website}" target="_blank" class="text-xs text-slate-400 hover:text-white transition-colors flex items-center gap-1" style="text-decoration:none;">🌐 Web</a>` : ''}
                             </div>
-                            <a href="http://googleusercontent.com/maps.google.com/3{r.lat},${r.lng}" target="_blank" class="inline-flex items-center gap-1 mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all" style="background:${r.color}20;color:${r.color};text-decoration:none;">🧭 Cómo llegar</a>
+                            <a href="http://googleusercontent.com/maps.google.com/${r.lat},${r.lng}" target="_blank" class="inline-flex items-center gap-1 mt-2 text-xs font-semibold px-3 py-1.5 rounded-lg transition-all" style="background:${r.color}20;color:${r.color};text-decoration:none;">🧭 Cómo llegar</a>
                         </div>
                     </div>
                 `;
