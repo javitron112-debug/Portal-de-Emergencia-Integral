@@ -1,7 +1,7 @@
 {
   "name": "Manual Táctico de Emergencias",
   "short_name": "Emergencias",
-  "start_url": "./INDEX.HTML",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1a1a",
   "theme_color": "#d32f2f",
