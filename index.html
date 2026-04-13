@@ -70,10 +70,16 @@
         <div class="max-w-4xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <i data-lucide="shield-alert" class="text-white w-8 h-8"></i>
-                <h1 class="font-bold text-xl uppercase tracking-tighter">Portal Emergencia</h1>
+                <h1 class="font-bold text-xl uppercase tracking-tighter hidden sm:block">Portal Emergencia</h1>
             </div>
-            <div id="connection-status" class="bg-green-500 text-[10px] px-2 py-1 rounded-full text-white font-bold uppercase">
-                Online
+            <div class="flex items-center gap-2">
+                <!-- Botón de instalación (oculto por defecto) -->
+                <button id="btn-install" class="hidden bg-white text-red-700 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase flex items-center gap-1 shadow-md hover:bg-slate-200 transition-colors">
+                    <i data-lucide="download" class="w-3 h-3"></i> Instalar App
+                </button>
+                <div id="connection-status" class="bg-green-500 text-[10px] px-2 py-1.5 rounded-full text-white font-bold uppercase">
+                    Online
+                </div>
             </div>
         </div>
     </header>
@@ -294,7 +300,52 @@
             initBackpack();
             startRadioTimer();
             checkNetworkStatus();
+            setupPWAInstall();
         };
+
+        // --- PWA INSTALLATION LOGIC ---
+        let deferredPrompt;
+        
+        function setupPWAInstall() {
+            const installBtn = document.getElementById('btn-install');
+            
+            // Escuchar el evento que indica que la app se puede instalar
+            window.addEventListener('beforeinstallprompt', (e) => {
+                // Evitar que Chrome muestre el prompt automáticamente
+                e.preventDefault();
+                // Guardar el evento para dispararlo luego
+                deferredPrompt = e;
+                // Mostrar el botón de instalación en la UI
+                installBtn.classList.remove('hidden');
+                installBtn.classList.add('flex');
+            });
+
+            // Lógica al hacer click en el botón
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt !== null) {
+                    // Mostrar el prompt nativo
+                    deferredPrompt.prompt();
+                    // Esperar a que el usuario responda
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') {
+                        console.log('App instalada por el usuario');
+                    }
+                    // Ya no se puede usar el mismo prompt
+                    deferredPrompt = null;
+                    // Ocultar botón
+                    installBtn.classList.add('hidden');
+                    installBtn.classList.remove('flex');
+                }
+            });
+
+            // Si la app se instala con éxito (incluso por otros métodos)
+            window.addEventListener('appinstalled', () => {
+                installBtn.classList.add('hidden');
+                installBtn.classList.remove('flex');
+                deferredPrompt = null;
+                console.log('PWA ha sido instalada en el sistema.');
+            });
+        }
 
         // --- DISCLAIMER LOGIC ---
         function checkDisclaimer() {
@@ -317,10 +368,10 @@
             const updateStatus = () => {
                 if (navigator.onLine) {
                     statusEl.textContent = 'Online';
-                    statusEl.className = 'bg-green-500 text-[10px] px-2 py-1 rounded-full text-white font-bold uppercase';
+                    statusEl.className = 'bg-green-500 text-[10px] px-2 py-1.5 rounded-full text-white font-bold uppercase';
                 } else {
                     statusEl.textContent = 'Modo Offline';
-                    statusEl.className = 'bg-red-500 text-[10px] px-2 py-1 rounded-full text-white font-bold uppercase';
+                    statusEl.className = 'bg-red-500 text-[10px] px-2 py-1.5 rounded-full text-white font-bold uppercase';
                 }
             };
             window.addEventListener('online', updateStatus);
