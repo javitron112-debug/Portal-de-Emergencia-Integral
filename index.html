@@ -218,6 +218,18 @@
                 <!-- 2. EVALUACIÓN INICIAL -->
                 <div class="mb-8">
                     <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">2. Evaluación Inicial (Diagnóstico)</h3>
+                    
+                    <details class="bg-slate-700/40 rounded-xl group border border-slate-600 mb-4">
+                        <summary class="font-bold flex items-center justify-between p-3 cursor-pointer select-none text-sm">
+                            <div class="flex items-center gap-2"><i data-lucide="image" class="w-4 h-4 text-blue-400"></i> Ver Infografía de Evaluación</div>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                        </summary>
+                        <div class="p-3 pt-0 border-t border-slate-600/50 mt-2">
+                            <img src="evaluacion.jpg" alt="Guía de Evaluación Inicial" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'evaluacion.jpg' no encontrada.</p>
+                        </div>
+                    </details>
+
                     <div class="bg-slate-700/30 border border-slate-600 p-5 rounded-xl space-y-3">
                         <div class="flex items-start gap-3">
                             <i data-lucide="brain" class="text-purple-400 w-5 h-5 flex-shrink-0 mt-0.5"></i>
@@ -347,31 +359,17 @@
                     <i data-lucide="triangle-alert"></i> Baliza S.O.S
                 </h2>
                 <p class="text-xs text-slate-400 mb-6 px-4">
-                    ADVERTENCIA: El uso continuado drenará rápidamente la batería. Use el destello visual de noche.
+                    ADVERTENCIA: El uso continuado drenará rápidamente la batería. Use el destello visual preferiblemente de noche. El código es (... --- ...).
                 </p>
-
-                <!-- Configuración SMS -->
-                <div class="bg-slate-900/50 border border-slate-700 p-4 rounded-xl mb-6 text-left max-w-xs mx-auto">
-                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Contacto de Emergencia (SMS)</label>
-                    <div class="flex items-center bg-slate-800 rounded-lg border border-slate-600 focus-within:border-red-500 transition-colors overflow-hidden">
-                        <div class="pl-3 text-slate-400"><i data-lucide="phone" class="w-4 h-4"></i></div>
-                        <input type="tel" id="sos-phone" placeholder="Ej: +34 600 000 000" class="w-full bg-transparent p-3 text-white text-sm outline-none" oninput="saveSOSPhone()">
-                    </div>
-                    <p class="text-[10px] text-slate-500 mt-2 italic">Al activar el SOS, se abrirá tu app de mensajes con tus coordenadas GPS listas para enviar.</p>
-                </div>
 
                 <div class="flex justify-center gap-6 mb-8">
                     <label class="flex flex-col items-center gap-2 cursor-pointer">
-                        <span class="text-xs font-semibold uppercase">Luz</span>
+                        <span class="text-sm font-semibold uppercase">Luz</span>
                         <input type="checkbox" id="sos-light-toggle" class="w-6 h-6 accent-red-500" checked>
                     </label>
                     <label class="flex flex-col items-center gap-2 cursor-pointer">
-                        <span class="text-xs font-semibold uppercase">Sonido</span>
+                        <span class="text-sm font-semibold uppercase">Sonido</span>
                         <input type="checkbox" id="sos-sound-toggle" class="w-6 h-6 accent-red-500" checked>
-                    </label>
-                    <label class="flex flex-col items-center gap-2 cursor-pointer">
-                        <span class="text-xs font-semibold uppercase text-blue-400">GPS SMS</span>
-                        <input type="checkbox" id="sos-sms-toggle" class="w-6 h-6 accent-blue-500" checked>
                     </label>
                 </div>
 
@@ -422,10 +420,6 @@
             startRadioTimer();
             checkNetworkStatus();
             setupPWAInstall();
-            
-            // Cargar teléfono SOS guardado
-            const savedPhone = localStorage.getItem('portal_sos_phone');
-            if(savedPhone) document.getElementById('sos-phone').value = savedPhone;
         };
 
         // --- PWA INSTALLATION LOGIC ---
@@ -602,11 +596,6 @@
 
         const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-        function saveSOSPhone() {
-            const phone = document.getElementById('sos-phone').value;
-            localStorage.setItem('portal_sos_phone', phone);
-        }
-
         async function toggleSOS() {
             const btn = document.getElementById('btn-toggle-sos');
             sosActive = !sosActive;
@@ -616,15 +605,9 @@
                 btn.classList.replace('bg-red-600', 'bg-slate-700');
                 btn.classList.replace('hover:bg-red-500', 'hover:bg-slate-600');
                 
-                // 1. Iniciar Audio
                 if (document.getElementById('sos-sound-toggle').checked) {
                     if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioContext.state === 'suspended') await audioContext.resume();
-                }
-
-                // 2. Intentar enviar SMS con GPS (No bloquea si falla)
-                if (document.getElementById('sos-sms-toggle').checked) {
-                    triggerEmergencySMS();
                 }
                 
                 runSOSLoop();
@@ -633,31 +616,6 @@
                 btn.classList.replace('bg-slate-700', 'bg-red-600');
                 btn.classList.replace('hover:bg-slate-600', 'hover:bg-red-500');
                 stopSignal();
-            }
-        }
-
-        function triggerEmergencySMS() {
-            const phone = document.getElementById('sos-phone').value.trim() || '112';
-            // Algunos dispositivos iOS requieren '&' en lugar de '?' para el body del SMS
-            const separator = /iPad|iPhone|iPod/.test(navigator.userAgent) ? '&' : '?';
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    pos => {
-                        const lat = pos.coords.latitude;
-                        const lng = pos.coords.longitude;
-                        const msg = encodeURIComponent(`¡S.O.S! Necesito ayuda urgente. Mi ubicación GPS actual es: https://maps.google.com/?q=${lat},${lng}`);
-                        window.location.href = `sms:${phone}${separator}body=${msg}`;
-                    }, 
-                    err => {
-                        const msg = encodeURIComponent(`¡S.O.S! Necesito ayuda urgente. (No se pudo obtener coordenadas GPS)`);
-                        window.location.href = `sms:${phone}${separator}body=${msg}`;
-                    }, 
-                    { timeout: 10000, maximumAge: 0, enableHighAccuracy: true }
-                );
-            } else {
-                const msg = encodeURIComponent(`¡S.O.S! Necesito ayuda urgente.`);
-                window.location.href = `sms:${phone}${separator}body=${msg}`;
             }
         }
 
@@ -691,9 +649,8 @@
             if (!audioContext) return;
             oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
-            // CAMBIO: Onda 'square' en lugar de 'sine' para máxima penetración acústica (más alto y estridente)
-            oscillator.type = 'square';
-            oscillator.frequency.value = 800; 
+            oscillator.type = 'sine';
+            oscillator.frequency.value = 800;
             
             gainNode.gain.setValueAtTime(0, audioContext.currentTime);
             gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.01);
