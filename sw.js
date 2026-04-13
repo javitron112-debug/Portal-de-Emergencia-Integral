@@ -1,9 +1,10 @@
-const CACHE_NAME = 'emergencia-cache-v2';
+const CACHE_NAME = 'emergencia-cache-v4';
 
-// Fáctico: Lista estricta de dependencias actuales de la aplicación.
-// Se han eliminado las dependencias del mapa (Leaflet) para garantizar el 100% offline nativo.
+// Fáctico: Lista estricta de dependencias actuales.
+// Se usa 'index.html' como punto de entrada de la aplicación.
 const urlsToCache = [
-  'portal_emergencia.html',
+  './', // Ruta raíz genérica
+  'index.html',
   'manifest.json',
   'icon-192.png',
   'icon-512.png',
@@ -26,6 +27,8 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
+  // Fuerza al Service Worker a activarse inmediatamente
+  self.skipWaiting();
 });
 
 // Interceptación de red: Prioridad Offline (Cache First)
@@ -39,7 +42,7 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Activación: Limpieza de cachés antiguas (v1) para no ocupar memoria innecesaria
+// Activación: Limpieza de cachés antiguas para no ocupar memoria innecesaria
 self.addEventListener('activate', event => {
   const cacheAllowlist = [CACHE_NAME];
   event.waitUntil(
@@ -54,4 +57,6 @@ self.addEventListener('activate', event => {
       );
     })
   );
+  // Reclama el control de las páginas abiertas inmediatamente
+  return self.clients.claim();
 });
