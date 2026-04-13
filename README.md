@@ -1,14 +1,14 @@
-🚨 Portal de Emergencia Integral (PWA)
+## 🚨 **Portal de Emergencia Integral (PWA)**
 
-⚠️ AVISO LEGAL CRÍTICO: Este proyecto es una versión de pruebas en fase de desarrollo. Los protocolos y guías aquí descritos tienen un carácter puramente informativo. Toda la responsabilidad derivada del uso de esta herramienta, así como de la ejecución de cualquier maniobra de primeros auxilios o protocolo de emergencia, recae exclusiva y totalmente sobre el usuario. Consulte siempre con el 112 y con los servicios de emergencia profesionales autorizados.
+*⚠️ AVISO LEGAL CRÍTICO: Este proyecto es una versión de pruebas en fase de desarrollo. Los protocolos y guías aquí descritos tienen un carácter puramente informativo. Toda la responsabilidad derivada del uso de esta herramienta, así como de la ejecución de cualquier maniobra de primeros auxilios o protocolo de emergencia, recae exclusiva y totalmente sobre el usuario. Consulte siempre con el 112 y con los servicios de emergencia profesionales autorizados.*
 
-📝 Descripción del Proyecto
+**📝 Descripción del Proyecto**
 
 El Portal de Emergencia Integral es una Aplicación Web Progresiva (PWA) táctica diseñada para asistir a la población civil en situaciones de emergencia grave o escenarios Grid-Down (caída total de la red eléctrica y de telecomunicaciones).
 
 Su arquitectura está construida bajo una filosofía estrictamente Offline-First. Una vez instalada, la aplicación no requiere conexión a Internet ni acceso a servidores externos, garantizando que las herramientas y protocolos vitales estén siempre disponibles en el dispositivo del usuario en el peor de los escenarios.
 
-🛠️ Utilidad y Módulos Principales
+**🛠️ Utilidad y Módulos Principales**
 
 La herramienta se estructura en cuatro pilares fundamentales de supervivencia y asistencia operativa:
 
@@ -36,7 +36,7 @@ Herramienta de último recurso para facilitar la localización y el rescate del 
 
 Características: Integra una señal lumínica estroboscópica (patrón Morse), una alarma acústica penetrante (onda cuadrada a 800 Hz) y un disparador táctico que redacta un SMS automático con la ubicación GPS exacta hacia un número de contacto predefinido.
 
-⚙️ Arquitectura Técnica
+**⚙️ Arquitectura Técnica**
 
 100% Autónoma: Todo el diseño y la lógica (HTML, Tailwind CSS, JS) reside en un único archivo de ejecución. Cero dependencias externas en tiempo de ejecución.
 
