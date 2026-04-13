@@ -116,27 +116,64 @@
 
         <!-- SECTION: PLAN 333 -->
         <section id="radio" class="tab-content space-y-6">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 text-center">
+            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
                 <h2 class="text-2xl font-bold flex items-center justify-center gap-2 mb-4">
                     <i data-lucide="radio" class="text-red-500"></i> Protocolo Plan 333
                 </h2>
-                <p class="text-slate-400 text-sm mb-6">Canal 3 PMR / Canal 3 CB | Cada 3 Horas | 3 Minutos</p>
                 
-                <div class="bg-slate-900 rounded-xl p-8 border-2 border-red-900 emergency-glow">
-                    <div class="text-xs uppercase text-slate-500 mb-2">Próxima Ventana en:</div>
+                <p class="text-slate-300 text-sm mb-6 leading-relaxed">
+                    El <strong>Plan 333</strong> es un estándar táctico para comunicaciones en escenarios de aislamiento (*Grid-Down*). Consiste en encender los equipos de radio en el <strong>Canal 3</strong>, cada <strong>3 horas</strong>, durante solo <strong>3 minutos</strong> para preservar la batería de los transmisores al máximo.
+                </p>
+                
+                <div class="bg-slate-900 rounded-xl p-6 border-2 border-red-900 emergency-glow text-center mb-6">
+                    <div class="text-xs uppercase text-slate-500 mb-2">Próxima Ventana Activa en:</div>
                     <div id="radio-timer" class="text-5xl font-mono font-bold text-red-500">00:00:00</div>
+                    <div class="mt-3">
+                        <span id="radio-status" class="text-sm font-bold text-yellow-500 uppercase px-3 py-1 bg-yellow-500/20 rounded-full">ESCUCHA (Batería OFF)</span>
+                    </div>
                 </div>
 
-                <div class="mt-6 grid grid-cols-2 gap-4">
-                    <div class="bg-slate-700/50 p-3 rounded-lg">
-                        <span class="block text-xs text-slate-400 uppercase">Estado</span>
-                        <span id="radio-status" class="font-bold text-yellow-500 uppercase">Escucha</span>
+                <div class="space-y-4">
+                    <!-- Frecuencias -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600">
+                            <span class="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">PMR446 (Walkies)</span>
+                            <span class="block font-bold text-lg text-white">Canal 3</span>
+                            <span class="block font-mono text-xs text-slate-300 mt-1">446.031 MHz</span>
+                        </div>
+                        <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600">
+                            <span class="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">CB-27 (Emisoras)</span>
+                            <span class="block font-bold text-lg text-white">Canal 3</span>
+                            <span class="block font-mono text-xs text-slate-300 mt-1">26.985 MHz (AM/FM)</span>
+                        </div>
                     </div>
-                    <div class="bg-slate-700/50 p-3 rounded-lg">
-                        <span class="block text-xs text-slate-400 uppercase">Frecuencia</span>
-                        <span class="font-bold">446.031 MHz</span>
+
+                    <!-- Alerta Canal 9 -->
+                    <div class="bg-red-950/50 border border-red-800 p-4 rounded-xl flex items-start gap-3">
+                        <i data-lucide="alert-triangle" class="text-red-500 w-6 h-6 flex-shrink-0 mt-0.5"></i>
+                        <div>
+                            <span class="block font-bold text-red-500 uppercase tracking-wide text-sm mb-1">Canal 9 de Emergencias (CB)</span>
+                            <span class="text-xs text-slate-300 leading-relaxed">
+                                En equipos CB-27, el <strong>Canal 9 (27.065 MHz)</strong> está reservado internacionalmente <strong>SÓLO para emergencias reales</strong> (riesgo vital, accidentes). No utilice este canal para conversaciones rutinarias.
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Protocolo de Transmisión -->
+                    <div class="bg-slate-700/30 border border-slate-600 p-5 rounded-xl">
+                        <h3 class="text-blue-400 font-bold uppercase text-xs mb-3 tracking-widest flex items-center gap-2">
+                            <i data-lucide="mic" class="w-4 h-4"></i> Qué decir al transmitir
+                        </h3>
+                        <p class="text-xs text-slate-400 mb-3 italic">Antes de presionar el botón (PTT), escuche 10 segundos. Si el canal está libre, transmita:</p>
+                        <ul class="text-sm text-slate-200 space-y-2">
+                            <li><strong class="text-white">1. Identificación:</strong> Quién es usted y tamaño de su grupo.</li>
+                            <li><strong class="text-white">2. Ubicación:</strong> Coordenadas GPS, calle exacta o puntos de referencia visuales inconfundibles.</li>
+                            <li><strong class="text-white">3. Situación:</strong> Qué ocurre de forma breve (herido grave, sin agua, fuego).</li>
+                            <li><strong class="text-white">4. Necesidad:</strong> Qué ayuda específica y urgente requiere.</li>
+                        </ul>
                     </div>
                 </div>
+
             </div>
         </section>
 
@@ -147,6 +184,7 @@
                     <i data-lucide="plus-circle" class="text-red-500"></i> Protocolos de Vida
                 </h2>
                 
+                <!-- 1. PAS -->
                 <div class="mb-8">
                     <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">1. Protocolo P.A.S.</h3>
                     <div class="grid grid-cols-3 gap-2 text-center">
@@ -165,8 +203,31 @@
                     </div>
                 </div>
 
+                <!-- 2. EVALUACIÓN INICIAL -->
                 <div class="mb-8">
-                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">2. Reanimación (RCP)</h3>
+                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">2. Evaluación Inicial (Diagnóstico)</h3>
+                    <div class="bg-slate-700/30 border border-slate-600 p-5 rounded-xl space-y-3">
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="brain" class="text-purple-400 w-5 h-5 flex-shrink-0 mt-0.5"></i>
+                            <p class="text-sm text-slate-200"><strong class="text-white">Comprobar Consciencia:</strong> Sacuda suavemente los hombros de la víctima y pregunte en voz alta: <em>"¿Se encuentra bien?"</em>. Si no hay respuesta, está inconsciente.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <i data-lucide="wind" class="text-blue-400 w-5 h-5 flex-shrink-0 mt-0.5"></i>
+                            <p class="text-sm text-slate-200"><strong class="text-white">Comprobar Respiración:</strong> Incline la cabeza hacia atrás (maniobra frente-mentón) para abrir la vía aérea. <strong>Ver, Oír y Sentir</strong> si respira con normalidad durante un máximo de 10 segundos.</p>
+                        </div>
+                        <div class="bg-red-950/50 p-3 rounded-lg border border-red-800/50 mt-2">
+                            <span class="text-xs text-red-200 font-bold uppercase">Decisión Crítica:</span><br>
+                            <span class="text-sm text-slate-300 block mt-1">
+                                • Si <strong>SÍ</strong> respira normal: Posición Lateral de Seguridad (PLS) y vigilar.<br>
+                                • Si <strong>NO</strong> respira normal: Iniciar RCP inmediatamente.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. RCP -->
+                <div class="mb-8">
+                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">3. Reanimación (RCP)</h3>
                     <div class="space-y-3">
                         <details class="bg-slate-700/40 rounded-xl group border border-slate-600">
                             <summary class="font-bold flex items-center justify-between p-4 cursor-pointer select-none">
@@ -203,8 +264,9 @@
                     </div>
                 </div>
 
-                <div>
-                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">3. Atragantamiento / Asfixia</h3>
+                <!-- 4. ATRAGANTAMIENTO -->
+                <div class="mb-8">
+                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">4. Atragantamiento / Asfixia</h3>
                     <div class="space-y-3">
                         <details class="bg-slate-700/40 rounded-xl group border border-slate-600">
                             <summary class="font-bold flex items-center justify-between p-4 cursor-pointer select-none">
@@ -227,6 +289,39 @@
                                 <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'atragantamiento-bebes.jpg' no encontrada.</p>
                             </div>
                         </details>
+                    </div>
+                </div>
+
+                <!-- 5. HEMORRAGIAS -->
+                <div>
+                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">5. Hemorragias Severas</h3>
+                    <div class="bg-slate-700/30 border border-slate-600 p-5 rounded-xl space-y-5">
+                        <div class="flex gap-4">
+                            <div class="bg-red-500/20 p-2.5 rounded-xl h-fit border border-red-500/30">
+                                <i data-lucide="hand-metal" class="text-red-400 w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <strong class="block text-white text-base mb-1">Presión Directa</strong>
+                                <p class="text-sm text-slate-300">Presione fuertemente sobre la herida con gasas limpias, toallas o ropa. Use ambas manos y el peso de su cuerpo si es necesario.</p>
+                                <p class="text-sm text-red-300 font-bold mt-1">Si la gasa se empapa de sangre, NO la quite. Coloque más material encima y siga presionando.</p>
+                            </div>
+                        </div>
+                        <div class="w-full h-px bg-slate-600/50"></div>
+                        <div class="flex gap-4">
+                            <div class="bg-orange-500/20 p-2.5 rounded-xl h-fit border border-orange-500/30">
+                                <i data-lucide="scissors" class="text-orange-400 w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <strong class="block text-white text-base mb-1">Torniquete (Último Recurso)</strong>
+                                <p class="text-sm text-slate-300">Utilizar SOLAMENTE en brazos o piernas cuando hay amputación o la presión directa no detiene el sangrado masivo vital.</p>
+                                <ul class="text-xs text-slate-400 mt-2 space-y-1">
+                                    <li>• Colocar de 5 a 8 cm por encima de la herida (nunca sobre una articulación).</li>
+                                    <li>• Apretar el molinete hasta que el sangrado cese por completo.</li>
+                                    <li>• <strong class="text-orange-300">Anotar la HORA EXACTA de colocación.</strong></li>
+                                    <li>• <strong class="text-red-400 uppercase">NUNCA aflojar el torniquete</strong> una vez puesto.</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -456,11 +551,11 @@
                 const isWindow = (hours % 3 === 0 && now.getMinutes() < 3);
                 const statusEl = document.getElementById('radio-status');
                 if (isWindow) {
-                    statusEl.innerText = "¡TRANSMITIENDO!";
-                    statusEl.className = "font-bold text-green-500 animate-pulse";
+                    statusEl.innerText = "¡TRANSMITIENDO! (Batería ON)";
+                    statusEl.className = "text-sm font-bold text-green-500 uppercase px-3 py-1 bg-green-500/20 rounded-full animate-pulse";
                 } else {
-                    statusEl.innerText = "ESCUCHA";
-                    statusEl.className = "font-bold text-yellow-500 uppercase";
+                    statusEl.innerText = "ESCUCHA (Batería OFF)";
+                    statusEl.className = "text-sm font-bold text-yellow-500 uppercase px-3 py-1 bg-yellow-500/20 rounded-full";
                 }
             }
             setInterval(update, 1000);
