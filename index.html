@@ -121,9 +121,21 @@
                     <i data-lucide="radio" class="text-red-500"></i> Protocolo Plan 333
                 </h2>
                 
-                <p class="text-slate-300 text-sm mb-6 leading-relaxed">
+                <p class="text-slate-300 text-sm mb-4 leading-relaxed">
                     El <strong>Plan 333</strong> es un estándar táctico para comunicaciones en escenarios de aislamiento (*Grid-Down*). Consiste en encender los equipos de radio en el <strong>Canal 3</strong>, cada <strong>3 horas</strong>, durante solo <strong>3 minutos</strong> para preservar la batería de los transmisores al máximo.
                 </p>
+
+                <!-- Infografía Plan 333 -->
+                <details class="bg-slate-700/40 rounded-xl group border border-slate-600 mb-6">
+                    <summary class="font-bold flex items-center justify-between p-3 cursor-pointer select-none text-sm">
+                        <div class="flex items-center gap-2"><i data-lucide="image" class="w-4 h-4 text-blue-400"></i> Ver Infografía Operativa</div>
+                        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                    </summary>
+                    <div class="p-3 pt-0 border-t border-slate-600/50 mt-2">
+                        <img src="plan333.jpg" alt="Guía del Plan 333" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'plan333.jpg' no encontrada.</p>
+                    </div>
+                </details>
                 
                 <div class="bg-slate-900 rounded-xl p-6 border-2 border-red-900 emergency-glow text-center mb-6">
                     <div class="text-xs uppercase text-slate-500 mb-2">Próxima Ventana Activa en:</div>
@@ -404,36 +416,26 @@
         function setupPWAInstall() {
             const installBtn = document.getElementById('btn-install');
             
-            // Escuchar el evento que indica que la app se puede instalar
             window.addEventListener('beforeinstallprompt', (e) => {
-                // Evitar que Chrome muestre el prompt automáticamente
                 e.preventDefault();
-                // Guardar el evento para dispararlo luego
                 deferredPrompt = e;
-                // Mostrar el botón de instalación en la UI
                 installBtn.classList.remove('hidden');
                 installBtn.classList.add('flex');
             });
 
-            // Lógica al hacer click en el botón
             installBtn.addEventListener('click', async () => {
                 if (deferredPrompt !== null) {
-                    // Mostrar el prompt nativo
                     deferredPrompt.prompt();
-                    // Esperar a que el usuario responda
                     const { outcome } = await deferredPrompt.userChoice;
                     if (outcome === 'accepted') {
                         console.log('App instalada por el usuario');
                     }
-                    // Ya no se puede usar el mismo prompt
                     deferredPrompt = null;
-                    // Ocultar botón
                     installBtn.classList.add('hidden');
                     installBtn.classList.remove('flex');
                 }
             });
 
-            // Si la app se instala con éxito (incluso por otros métodos)
             window.addEventListener('appinstalled', () => {
                 installBtn.classList.add('hidden');
                 installBtn.classList.remove('flex');
