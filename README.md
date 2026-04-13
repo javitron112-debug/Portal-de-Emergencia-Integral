@@ -1,46 +1,45 @@
-# 🚨 Portal de Emergencia Integral (Manual Táctico)
+🚨 Portal de Emergencia Integral (PWA)
 
-**URL en vivo:** [https://javitron112-debug.github.io/Portal-de-Emergencia-Integral/](https://javitron112-debug.github.io/Portal-de-Emergencia-Integral/)
+⚠️ AVISO LEGAL CRÍTICO: Este proyecto es una versión de pruebas en fase de desarrollo. Los protocolos y guías aquí descritos tienen un carácter puramente informativo. Toda la responsabilidad derivada del uso de esta herramienta, así como de la ejecución de cualquier maniobra de primeros auxilios o protocolo de emergencia, recae exclusiva y totalmente sobre el usuario. Consulte siempre con el 112 y con los servicios de emergencia profesionales autorizados.
 
-## 📝 Descripción General
+📝 Descripción del Proyecto
 
-El **Portal de Emergencia Integral** es una aplicación web progresiva (PWA) diseñada para ofrecer asistencia crítica, protocolos de supervivencia y localización de recursos en situaciones de emergencia grave o escenarios *Grid-Down* (caída total de redes eléctricas y de telecomunicaciones). 
+El Portal de Emergencia Integral es una Aplicación Web Progresiva (PWA) táctica diseñada para asistir a la población civil en situaciones de emergencia grave o escenarios Grid-Down (caída total de la red eléctrica y de telecomunicaciones).
 
-Su arquitectura está pensada para ser **instalable en dispositivos móviles y funcionar 100% offline**, garantizando que el usuario tenga acceso a información vital para la vida incluso cuando no hay acceso a Internet.
+Su arquitectura está construida bajo una filosofía estrictamente Offline-First. Una vez instalada, la aplicación no requiere conexión a Internet ni acceso a servidores externos, garantizando que las herramientas y protocolos vitales estén siempre disponibles en el dispositivo del usuario en el peor de los escenarios.
 
----
+🛠️ Utilidad y Módulos Principales
 
-## 🛠️ Utilidad y Herramientas Principales
+La herramienta se estructura en cuatro pilares fundamentales de supervivencia y asistencia operativa:
 
-La aplicación se divide en cuatro pilares fundamentales de supervivencia y asistencia ciudadana:
+1. 🎒 Mochila de 72 Horas
 
-### 1. 🎒 Mochila de 72 Horas (Checklist Interactivo)
-Una lista de control exhaustiva basada en los estándares oficiales de Protección Civil y la Cruz Roja. 
-* **Utilidad:** Permite a los ciudadanos preparar y auditar su equipo de evacuación o aislamiento.
-* **Características:** Incluye categorías de Hidratación, Refugio/Ropa, Iluminación/Fuego, Herramientas, Botiquín y Documentos. Cuenta con una barra de progreso que guarda automáticamente el estado en el dispositivo del usuario.
+Sistema de auditoría para preparar el equipo de evacuación o aislamiento.
 
-### 2. 📻 Plan 333 (Comunicaciones Radio)
-Un protocolo operativo de radiocomunicaciones de emergencia para la población civil en caso de aislamiento tecnológico.
-* **Utilidad:** Optimiza al máximo la batería de los transmisores (walkie-talkies PMR446 o CB-27) estableciendo ventanas de comunicación globales.
-* **Características:** Incluye un temporizador en tiempo real que indica exactamente cuándo encender el equipo (Canal 3, cada 3 horas, durante 3 minutos) para coordinar escucha, emergencias y logística.
+Características: Checklist interactivo categorizado (Hidratación, Alimentación, Iluminación, Botiquín, etc.). Cuenta con persistencia de datos local (el progreso no se pierde al cerrar la app) e infografías de referencia visual rápida.
 
-### 3. 🗺️ Mapa Táctico de Emergencias
-Un buscador GPS avanzado conectado a la base de datos de OpenStreetMap que localiza infraestructura crítica en un radio de 2 a 5 kilómetros.
-* **Utilidad:** Permite encontrar rápidamente la Comisaría de Policía, Estación de Bomberos, base de Protección Civil o puesto de Cruz Roja más cercano.
-* **Características:** Funciona mediante búsqueda por dirección o geolocalización GPS directa. Si el usuario ha descargado los mapas de Google Maps previamente, el sistema de navegación hacia el recurso funcionará sin conexión a Internet.
+2. 📻 Protocolo Plan 333 (Comunicaciones)
 
-### 4. 🩹 Primeros Auxilios (Protocolos P.A.S.)
-Guías visuales y directas para intervenciones de vida o muerte por parte de personal no sanitario.
-* **Utilidad:** Ofrece instrucciones inmediatas y fácticas sobre cómo actuar en los primeros minutos de una emergencia médica.
-* **Características:** Incluye el algoritmo universal P.A.S. (Proteger, Avisar, Socorrer), protocolos detallados de Reanimación Cardiopulmonar (RCP) y maniobras para atragantamiento (Heimlich), diferenciados por edad: Adultos, Niños (1-8 años) y Bebés (<1 año).
+Estandarización de comunicaciones por radio para priorizar el ahorro crítico de batería.
 
----
+Características: Cronómetro inteligente que calcula las ventanas operativas (Canal 3, cada 3 horas, durante 3 minutos). Incluye tablas de frecuencias de uso libre (PMR446) y Banda Ciudadana (CB-27), además de directrices de disciplina de radio.
 
-## ⚙️ Características Técnicas Críticas
+3. 🩹 Protocolos de Auxilio
 
-* **PWA (Progressive Web App):** A través del archivo `manifest.json` y el motor `sw.js` (Service Worker), la web se instala como una app nativa en Android/iOS.
-* **Tolerancia a fallos 504:** El mapa táctico cuenta con un sistema de redundancia de múltiples servidores internacionales para evitar caídas en caso de saturación de la red.
-* **Cero dependencias externas:** Tras la primera carga, todos los textos, imágenes y lógicas se alojan en la caché profunda del dispositivo.
+Guías de intervención rápida y directa para emergencias médicas de riesgo vital por parte de personal no sanitario.
 
----
-*Documento generado para fines de preparación ciudadana. Se recomienda verificar siempre los protocolos con el 112 y las autoridades locales de Protección Civil.*
+Características: Algoritmo P.A.S. (Proteger, Avisar, Socorrer), evaluación de consciencia y respiración, soporte vital básico (RCP) y desobstrucción de vía aérea (Heimlich) con infografías divididas por edad (Adultos, Niños, Bebés). Incluye protocolo de control de hemorragias masivas.
+
+4. 🆘 Baliza S.O.S
+
+Herramienta de último recurso para facilitar la localización y el rescate del usuario.
+
+Características: Integra una señal lumínica estroboscópica (patrón Morse), una alarma acústica penetrante (onda cuadrada a 800 Hz) y un disparador táctico que redacta un SMS automático con la ubicación GPS exacta hacia un número de contacto predefinido.
+
+⚙️ Arquitectura Técnica
+
+100% Autónoma: Todo el diseño y la lógica (HTML, Tailwind CSS, JS) reside en un único archivo de ejecución. Cero dependencias externas en tiempo de ejecución.
+
+PWA Instalable: Utiliza un manifest.json y un Service Worker (sw.js) a prueba de fallos para instalarse en el escritorio de dispositivos Android, iOS y sistemas de escritorio.
+
+Privacidad y Seguridad: La aplicación no utiliza bases de datos en la nube ni telemetría. Toda la configuración del usuario se almacena localmente mediante localStorage.
