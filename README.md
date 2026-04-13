@@ -1,4 +1,4 @@
-#🚨 Portal de Emergencia Integral (PWA)#
+🚨 Portal de Emergencia Integral (PWA)
 
 ⚠️ AVISO LEGAL CRÍTICO: Este proyecto es una versión de pruebas en fase de desarrollo. Los protocolos y guías aquí descritos tienen un carácter puramente informativo. Toda la responsabilidad derivada del uso de esta herramienta, así como de la ejecución de cualquier maniobra de primeros auxilios o protocolo de emergencia, recae exclusiva y totalmente sobre el usuario. Consulte siempre con el 112 y con los servicios de emergencia profesionales autorizados.
 
