@@ -1,676 +1,90 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0f172a">
-    <title>Portal de Emergencia Integral</title>
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
+const CACHE_NAME = 'emergencia-cache-v8';
 
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .emergency-glow { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
-        }
-        #sos-flash-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background-color: white;
-            z-index: 9999;
-        }
-        details > summary i.lucide-chevron-down {
-            transition: transform 0.2s ease-in-out;
-        }
-        details[open] > summary i.lucide-chevron-down {
-            transform: rotate(180deg);
-        }
-        details summary::-webkit-details-marker {
-            display:none;
-        }
-    </style>
-</head>
-<body class="pb-20">
+// Fáctico: Lista estricta solo con archivos locales.
+// Incluye TODAS las imágenes referenciadas en el index.html más reciente.
+const urlsToCache = [
+  './',
+  'index.html',
+  'manifest.json',
+  'icon-192.png',
+  'icon-512.png',
+  'mochila.jpg',
+  'plan333.jpg',
+  'evaluacion.jpg',
+  'hemorragia.jpg',
+  'rcp-adultos.jpg',
+  'rcp-ninos.jpg',
+  'rcp-bebes.jpg',
+  'atragantamiento-adultos-ninos.jpg',
+  'atragantamiento-bebes.jpg'
+];
 
-    <!-- AVISO LEGAL MODAL -->
-    <div id="disclaimer-modal" class="fixed inset-0 bg-slate-900/95 z-[10000] hidden items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-slate-800 border border-red-600 rounded-2xl p-6 max-w-md w-full shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-red-600"></div>
-            <div class="mx-auto bg-red-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                <i data-lucide="alert-triangle" class="text-red-500 w-8 h-8"></i>
-            </div>
-            <h2 class="text-xl font-bold text-center text-white uppercase tracking-wider mb-4">Advertencia Legal Crítica</h2>
-            <div class="text-sm text-slate-300 space-y-3 mb-6">
-                <p>Esta aplicación es una <strong>versión de pruebas en fase de desarrollo</strong>. Los protocolos y guías aquí descritos tienen un carácter puramente informativo.</p>
-                <p>Toda la responsabilidad derivada del uso de esta herramienta, así como de la ejecución de cualquier maniobra de primeros auxilios o protocolo de emergencia, <strong>recae exclusiva y totalmente sobre el usuario</strong>.</p>
-                <p class="text-red-400 font-bold">Consulte siempre con el 112 y con los servicios de emergencia profesionales autorizados.</p>
-            </div>
-            <button onclick="acceptDisclaimer()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl uppercase tracking-widest transition-colors flex justify-center items-center gap-2">
-                <i data-lucide="check-circle" class="w-5 h-5"></i> Acepto la Responsabilidad
-            </button>
-        </div>
-    </div>
-
-    <!-- Destello visual SOS -->
-    <div id="sos-flash-overlay"></div>
-
-    <!-- Header -->
-    <header class="bg-red-700 p-4 sticky top-0 z-50 shadow-lg">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <i data-lucide="shield-alert" class="text-white w-8 h-8"></i>
-                <h1 class="font-bold text-xl uppercase tracking-tighter hidden sm:block">Portal Emergencia</h1>
-            </div>
-            <div class="flex items-center gap-2">
-                <!-- Botón de instalación (oculto por defecto) -->
-                <button id="btn-install" class="hidden bg-white text-red-700 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase flex items-center gap-1 shadow-md hover:bg-slate-200 transition-colors">
-                    <i data-lucide="download" class="w-3 h-3"></i> Instalar App
-                </button>
-                <div id="connection-status" class="bg-green-500 text-[10px] px-2 py-1.5 rounded-full text-white font-bold uppercase">
-                    Online
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <main class="max-w-4xl mx-auto p-4">
-        
-        <!-- SECTION: MOCHILA 72H -->
-        <section id="backpack" class="tab-content active space-y-6">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                <h2 class="text-2xl font-bold flex items-center gap-2 mb-4">
-                    <i data-lucide="package" class="text-red-500"></i> Mochila de 72 Horas
-                </h2>
-                <div class="w-full bg-slate-700 h-4 rounded-full mb-4 overflow-hidden">
-                    <div id="backpack-progress" class="bg-green-500 h-full transition-all duration-500" style="width: 0%"></div>
-                </div>
-
-                <!-- Infografía Mochila -->
-                <details class="bg-slate-700/40 rounded-xl group border border-slate-600 mb-6">
-                    <summary class="font-bold flex items-center justify-between p-3 cursor-pointer select-none text-sm">
-                        <div class="flex items-center gap-2"><i data-lucide="image" class="w-4 h-4 text-blue-400"></i> Ver Infografía Guía</div>
-                        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
-                    </summary>
-                    <div class="p-3 pt-0 border-t border-slate-600/50 mt-2">
-                        <img src="mochila.jpg" alt="Suministros Esenciales" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'mochila.jpg' no encontrada.</p>
-                    </div>
-                </details>
-                
-                <div id="checklist-container" class="space-y-4">
-                    <!-- Categorías se generarán por JS -->
-                </div>
-            </div>
-        </section>
-
-        <!-- SECTION: PLAN 333 -->
-        <section id="radio" class="tab-content space-y-6">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                <h2 class="text-2xl font-bold flex items-center justify-center gap-2 mb-4">
-                    <i data-lucide="radio" class="text-red-500"></i> Protocolo Plan 333
-                </h2>
-                
-                <p class="text-slate-300 text-sm mb-4 leading-relaxed">
-                    El <strong>Plan 333</strong> es un estándar táctico para comunicaciones en escenarios de aislamiento (*Grid-Down*). Consiste en encender los equipos de radio en el <strong>Canal 3</strong>, cada <strong>3 horas</strong>, durante solo <strong>3 minutos</strong> para preservar la batería de los transmisores al máximo.
-                </p>
-
-                <!-- Infografía Plan 333 -->
-                <details class="bg-slate-700/40 rounded-xl group border border-slate-600 mb-6">
-                    <summary class="font-bold flex items-center justify-between p-3 cursor-pointer select-none text-sm">
-                        <div class="flex items-center gap-2"><i data-lucide="image" class="w-4 h-4 text-blue-400"></i> Ver Infografía Operativa</div>
-                        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
-                    </summary>
-                    <div class="p-3 pt-0 border-t border-slate-600/50 mt-2">
-                        <img src="plan333.jpg" alt="Guía del Plan 333" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'plan333.jpg' no encontrada.</p>
-                    </div>
-                </details>
-                
-                <div class="bg-slate-900 rounded-xl p-6 border-2 border-red-900 emergency-glow text-center mb-6">
-                    <div class="text-xs uppercase text-slate-500 mb-2">Próxima Ventana Activa en:</div>
-                    <div id="radio-timer" class="text-5xl font-mono font-bold text-red-500">00:00:00</div>
-                    <div class="mt-3">
-                        <span id="radio-status" class="text-sm font-bold text-yellow-500 uppercase px-3 py-1 bg-yellow-500/20 rounded-full">ESCUCHA (Batería OFF)</span>
-                    </div>
-                </div>
-
-                <div class="space-y-4">
-                    <!-- Frecuencias -->
-                    <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600">
-                            <span class="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">PMR446 (Walkies)</span>
-                            <span class="block font-bold text-lg text-white">Canal 3</span>
-                            <span class="block font-mono text-xs text-slate-300 mt-1">446.031 MHz</span>
-                        </div>
-                        <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600">
-                            <span class="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">CB-27 (Emisoras)</span>
-                            <span class="block font-bold text-lg text-white">Canal 3</span>
-                            <span class="block font-mono text-xs text-slate-300 mt-1">26.985 MHz (AM/FM)</span>
-                        </div>
-                    </div>
-
-                    <!-- Alerta Canal 9 -->
-                    <div class="bg-red-950/50 border border-red-800 p-4 rounded-xl flex items-start gap-3">
-                        <i data-lucide="alert-triangle" class="text-red-500 w-6 h-6 flex-shrink-0 mt-0.5"></i>
-                        <div>
-                            <span class="block font-bold text-red-500 uppercase tracking-wide text-sm mb-1">Canal 9 de Emergencias (CB)</span>
-                            <span class="text-xs text-slate-300 leading-relaxed">
-                                En equipos CB-27, el <strong>Canal 9 (27.065 MHz)</strong> está reservado internacionalmente <strong>SÓLO para emergencias reales</strong> (riesgo vital, accidentes). No utilice este canal para conversaciones rutinarias.
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Protocolo de Transmisión -->
-                    <div class="bg-slate-700/30 border border-slate-600 p-5 rounded-xl">
-                        <h3 class="text-blue-400 font-bold uppercase text-xs mb-3 tracking-widest flex items-center gap-2">
-                            <i data-lucide="mic" class="w-4 h-4"></i> Qué decir al transmitir
-                        </h3>
-                        <p class="text-xs text-slate-400 mb-3 italic">Antes de presionar el botón (PTT), escuche 10 segundos. Si el canal está libre, transmita:</p>
-                        <ul class="text-sm text-slate-200 space-y-2">
-                            <li><strong class="text-white">1. Identificación:</strong> Quién es usted y tamaño de su grupo.</li>
-                            <li><strong class="text-white">2. Ubicación:</strong> Coordenadas GPS, calle exacta o puntos de referencia visuales inconfundibles.</li>
-                            <li><strong class="text-white">3. Situación:</strong> Qué ocurre de forma breve (herido grave, sin agua, fuego).</li>
-                            <li><strong class="text-white">4. Necesidad:</strong> Qué ayuda específica y urgente requiere.</li>
-                        </ul>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- SECTION: PRIMEROS AUXILIOS -->
-        <section id="aid" class="tab-content space-y-4">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                <h2 class="text-2xl font-bold flex items-center gap-2 mb-6">
-                    <i data-lucide="plus-circle" class="text-red-500"></i> Protocolos de Vida
-                </h2>
-                
-                <!-- 1. PAS -->
-                <div class="mb-8">
-                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">1. Protocolo P.A.S.</h3>
-                    <div class="grid grid-cols-3 gap-2 text-center">
-                        <div class="bg-slate-900 p-4 rounded-xl border-t-4 border-blue-500">
-                            <div class="font-bold text-2xl">P</div>
-                            <div class="text-[10px] uppercase">Proteger</div>
-                        </div>
-                        <div class="bg-slate-900 p-4 rounded-xl border-t-4 border-yellow-500">
-                            <div class="font-bold text-2xl">A</div>
-                            <div class="text-[10px] uppercase">Avisar</div>
-                        </div>
-                        <div class="bg-slate-900 p-4 rounded-xl border-t-4 border-red-500">
-                            <div class="font-bold text-2xl">S</div>
-                            <div class="text-[10px] uppercase">Socorrer</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. EVALUACIÓN INICIAL -->
-                <div class="mb-8">
-                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">2. Evaluación Inicial (Diagnóstico)</h3>
-                    <div class="bg-slate-700/30 border border-slate-600 p-5 rounded-xl space-y-3">
-                        <div class="flex items-start gap-3">
-                            <i data-lucide="brain" class="text-purple-400 w-5 h-5 flex-shrink-0 mt-0.5"></i>
-                            <p class="text-sm text-slate-200"><strong class="text-white">Comprobar Consciencia:</strong> Sacuda suavemente los hombros de la víctima y pregunte en voz alta: <em>"¿Se encuentra bien?"</em>. Si no hay respuesta, está inconsciente.</p>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <i data-lucide="wind" class="text-blue-400 w-5 h-5 flex-shrink-0 mt-0.5"></i>
-                            <p class="text-sm text-slate-200"><strong class="text-white">Comprobar Respiración:</strong> Incline la cabeza hacia atrás (maniobra frente-mentón) para abrir la vía aérea. <strong>Ver, Oír y Sentir</strong> si respira con normalidad durante un máximo de 10 segundos.</p>
-                        </div>
-                        <div class="bg-red-950/50 p-3 rounded-lg border border-red-800/50 mt-2">
-                            <span class="text-xs text-red-200 font-bold uppercase">Decisión Crítica:</span><br>
-                            <span class="text-sm text-slate-300 block mt-1">
-                                • Si <strong>SÍ</strong> respira normal: Posición Lateral de Seguridad (PLS) y vigilar.<br>
-                                • Si <strong>NO</strong> respira normal: Iniciar RCP inmediatamente.
-                            </span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 3. RCP -->
-                <div class="mb-8">
-                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">3. Reanimación (RCP)</h3>
-                    <div class="space-y-3">
-                        <details class="bg-slate-700/40 rounded-xl group border border-slate-600">
-                            <summary class="font-bold flex items-center justify-between p-4 cursor-pointer select-none">
-                                <div class="flex items-center gap-2"><i data-lucide="user" class="w-5 h-5 text-blue-400"></i> RCP Adultos</div>
-                                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
-                            </summary>
-                            <div class="p-4 pt-0 border-t border-slate-600/50 mt-2">
-                                <img src="rcp-adultos.jpg" alt="Guía RCP Adultos" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'rcp-adultos.jpg' no encontrada.</p>
-                            </div>
-                        </details>
-
-                        <details class="bg-slate-700/40 rounded-xl group border border-slate-600">
-                            <summary class="font-bold flex items-center justify-between p-4 cursor-pointer select-none">
-                                <div class="flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-green-400"></i> RCP Niños (1 a Pubertad)</div>
-                                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
-                            </summary>
-                            <div class="p-4 pt-0 border-t border-slate-600/50 mt-2">
-                                <img src="rcp-ninos.jpg" alt="Guía RCP Niños" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'rcp-ninos.jpg' no encontrada.</p>
-                            </div>
-                        </details>
-
-                        <details class="bg-slate-700/40 rounded-xl group border border-slate-600">
-                            <summary class="font-bold flex items-center justify-between p-4 cursor-pointer select-none">
-                                <div class="flex items-center gap-2"><i data-lucide="baby" class="w-5 h-5 text-yellow-400"></i> RCP Lactantes (&lt; 1 año)</div>
-                                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
-                            </summary>
-                            <div class="p-4 pt-0 border-t border-slate-600/50 mt-2">
-                                <img src="rcp-bebes.jpg" alt="Guía RCP Bebés" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'rcp-bebes.jpg' no encontrada.</p>
-                            </div>
-                        </details>
-                    </div>
-                </div>
-
-                <!-- 4. ATRAGANTAMIENTO -->
-                <div class="mb-8">
-                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">4. Atragantamiento / Asfixia</h3>
-                    <div class="space-y-3">
-                        <details class="bg-slate-700/40 rounded-xl group border border-slate-600">
-                            <summary class="font-bold flex items-center justify-between p-4 cursor-pointer select-none">
-                                <div class="flex items-center gap-2"><i data-lucide="user-x" class="w-5 h-5 text-orange-400"></i> Adultos y Niños (Heimlich)</div>
-                                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
-                            </summary>
-                            <div class="p-4 pt-0 border-t border-slate-600/50 mt-2">
-                                <img src="atragantamiento-adultos-ninos.jpg" alt="Guía Atragantamiento Adultos y Niños" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'atragantamiento-adultos-ninos.jpg' no encontrada.</p>
-                            </div>
-                        </details>
-
-                        <details class="bg-slate-700/40 rounded-xl group border border-slate-600">
-                            <summary class="font-bold flex items-center justify-between p-4 cursor-pointer select-none">
-                                <div class="flex items-center gap-2"><i data-lucide="baby" class="w-5 h-5 text-yellow-400"></i> Bebés (&lt; 1 año)</div>
-                                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
-                            </summary>
-                            <div class="p-4 pt-0 border-t border-slate-600/50 mt-2">
-                                <img src="atragantamiento-bebes.jpg" alt="Guía Atragantamiento Bebés" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'atragantamiento-bebes.jpg' no encontrada.</p>
-                            </div>
-                        </details>
-                    </div>
-                </div>
-
-                <!-- 5. HEMORRAGIAS -->
-                <div>
-                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">5. Hemorragias Severas</h3>
-                    <div class="bg-slate-700/30 border border-slate-600 p-5 rounded-xl space-y-5">
-                        <div class="flex gap-4">
-                            <div class="bg-red-500/20 p-2.5 rounded-xl h-fit border border-red-500/30">
-                                <i data-lucide="hand-metal" class="text-red-400 w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <strong class="block text-white text-base mb-1">Presión Directa</strong>
-                                <p class="text-sm text-slate-300">Presione fuertemente sobre la herida con gasas limpias, toallas o ropa. Use ambas manos y el peso de su cuerpo si es necesario.</p>
-                                <p class="text-sm text-red-300 font-bold mt-1">Si la gasa se empapa de sangre, NO la quite. Coloque más material encima y siga presionando.</p>
-                            </div>
-                        </div>
-                        <div class="w-full h-px bg-slate-600/50"></div>
-                        <div class="flex gap-4">
-                            <div class="bg-orange-500/20 p-2.5 rounded-xl h-fit border border-orange-500/30">
-                                <i data-lucide="scissors" class="text-orange-400 w-6 h-6"></i>
-                            </div>
-                            <div>
-                                <strong class="block text-white text-base mb-1">Torniquete (Último Recurso)</strong>
-                                <p class="text-sm text-slate-300">Utilizar SOLAMENTE en brazos o piernas cuando hay amputación o la presión directa no detiene el sangrado masivo vital.</p>
-                                <ul class="text-xs text-slate-400 mt-2 space-y-1">
-                                    <li>• Colocar de 5 a 8 cm por encima de la herida (nunca sobre una articulación).</li>
-                                    <li>• Apretar el molinete hasta que el sangrado cese por completo.</li>
-                                    <li>• <strong class="text-orange-300">Anotar la HORA EXACTA de colocación.</strong></li>
-                                    <li>• <strong class="text-red-400 uppercase">NUNCA aflojar el torniquete</strong> una vez puesto.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- SECTION: S.O.S GENERATOR -->
-        <section id="sos-section" class="tab-content space-y-4">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 text-center">
-                <h2 class="text-2xl font-bold flex items-center justify-center gap-2 mb-2 text-red-500">
-                    <i data-lucide="triangle-alert"></i> Baliza S.O.S
-                </h2>
-                <p class="text-xs text-slate-400 mb-6 px-4">
-                    ADVERTENCIA: El uso continuado drenará rápidamente la batería. Use el destello visual preferiblemente de noche. El código es (... --- ...).
-                </p>
-
-                <div class="flex justify-center gap-6 mb-8">
-                    <label class="flex flex-col items-center gap-2 cursor-pointer">
-                        <span class="text-sm font-semibold uppercase">Luz</span>
-                        <input type="checkbox" id="sos-light-toggle" class="w-6 h-6 accent-red-500" checked>
-                    </label>
-                    <label class="flex flex-col items-center gap-2 cursor-pointer">
-                        <span class="text-sm font-semibold uppercase">Sonido</span>
-                        <input type="checkbox" id="sos-sound-toggle" class="w-6 h-6 accent-red-500" checked>
-                    </label>
-                </div>
-
-                <button id="btn-toggle-sos" onclick="toggleSOS()" class="bg-red-600 hover:bg-red-500 text-white font-bold py-6 px-12 rounded-full text-2xl uppercase tracking-widest shadow-[0_0_20px_rgba(220,38,38,0.5)] transition-all transform active:scale-95 w-full max-w-xs mx-auto">
-                    Iniciar S.O.S
-                </button>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Navigation Bar ajustada a 4 items -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-700 flex justify-between px-4 py-2 z-50">
-        <button onclick="showTab('backpack')" class="nav-btn flex flex-col items-center p-2 text-red-500 flex-1" data-tab="backpack">
-            <i data-lucide="package" class="w-6 h-6"></i>
-            <span class="text-[10px] mt-1 font-semibold">Mochila</span>
-        </button>
-        <button onclick="showTab('radio')" class="nav-btn flex flex-col items-center p-2 text-slate-500 flex-1" data-tab="radio">
-            <i data-lucide="radio" class="w-6 h-6"></i>
-            <span class="text-[10px] mt-1 font-semibold">Plan 333</span>
-        </button>
-        <button onclick="showTab('aid')" class="nav-btn flex flex-col items-center p-2 text-slate-500 flex-1" data-tab="aid">
-            <i data-lucide="plus-circle" class="w-6 h-6"></i>
-            <span class="text-[10px] mt-1 font-semibold">Auxilio</span>
-        </button>
-        <button onclick="showTab('sos-section')" class="nav-btn flex flex-col items-center p-2 text-slate-500 flex-1" data-tab="sos-section">
-            <i data-lucide="triangle-alert" class="w-6 h-6"></i>
-            <span class="text-[10px] mt-1 font-semibold">S.O.S</span>
-        </button>
-    </nav>
-
-    <script>
-        // --- DATA ---
-        const backpackData = [
-            { cat: "Hidratación", items: ["3L de agua por persona/día", "Pastillas potabilizadoras", "Cantimplora de metal"] },
-            { cat: "Alimentación", items: ["Barritas energéticas", "Comida enlatada (abre-fácil)", "Frutos secos"] },
-            { cat: "Iluminación/Fuego", items: ["Linterna frontal", "Pilas de repuesto", "Mechero y cerillas estancas"] },
-            { cat: "Botiquín", items: ["Vendas y gasas", "Antiséptico", "Medicamentos personales", "Manta térmica"] },
-            { cat: "Herramientas", items: ["Navaja multiusos", "Silbato de emergencia", "Cinta americana"] },
-            { cat: "Documentos y Efectivo", items: ["Copia DNI/Pasaporte", "Dinero en efectivo (billetes pequeños)", "Libreta y bolígrafo", "Copia llaves"] }
-        ];
-
-        // --- INITIALIZATION ---
-        window.onload = function() {
-            lucide.createIcons();
-            checkDisclaimer();
-            initBackpack();
-            startRadioTimer();
-            checkNetworkStatus();
-            setupPWAInstall();
-        };
-
-        // --- PWA INSTALLATION LOGIC ---
-        let deferredPrompt;
-        
-        function setupPWAInstall() {
-            const installBtn = document.getElementById('btn-install');
-            
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                installBtn.classList.remove('hidden');
-                installBtn.classList.add('flex');
+// Instalación: Descarga y guarda archivos críticos uno a uno (Anti-fallos)
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('[Service Worker] Instalando caché profunda...');
+        // Al usar Promise.all con un catch individual, si falta una imagen
+        // el Service Worker ignorará el error y continuará la instalación de la app.
+        return Promise.all(
+          urlsToCache.map(url => {
+            return cache.add(url).catch(err => {
+              console.warn(`[Service Worker] Ignorando archivo no encontrado (no bloqueará instalación): ${url}`);
             });
+          })
+        );
+      })
+  );
+  // Fuerza al Service Worker a activarse sin esperar a que se cierren pestañas
+  self.skipWaiting();
+});
 
-            installBtn.addEventListener('click', async () => {
-                if (deferredPrompt !== null) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        console.log('App instalada por el usuario');
-                    }
-                    deferredPrompt = null;
-                    installBtn.classList.add('hidden');
-                    installBtn.classList.remove('flex');
-                }
+// Interceptación de red y Caché Dinámico
+self.addEventListener('fetch', event => {
+  // Ignorar peticiones que no sean GET (necesario por seguridad)
+  if (event.request.method !== 'GET') return;
+
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        // 1. Si el archivo ya está guardado offline, lo devuelve inmediatamente
+        if (response) {
+          return response;
+        }
+
+        // 2. Si no está en caché (ej. las librerías Tailwind o Lucide), lo descarga y lo guarda dinámicamente
+        return fetch(event.request).then(networkResponse => {
+          // Comprueba si la respuesta es válida o es un recurso externo seguro (CORS / Opaco)
+          if (networkResponse && (networkResponse.status === 200 || networkResponse.type === 'opaque' || networkResponse.type === 'cors')) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, responseToCache);
             });
+          }
+          return networkResponse;
+        }).catch(err => {
+          console.error('[Service Worker] Red caída. No se pudo obtener:', event.request.url);
+        });
+      })
+  );
+});
 
-            window.addEventListener('appinstalled', () => {
-                installBtn.classList.add('hidden');
-                installBtn.classList.remove('flex');
-                deferredPrompt = null;
-                console.log('PWA ha sido instalada en el sistema.');
-            });
-        }
-
-        // --- DISCLAIMER LOGIC ---
-        function checkDisclaimer() {
-            const isAccepted = localStorage.getItem('portal_disclaimer_accepted');
-            if (!isAccepted) {
-                document.getElementById('disclaimer-modal').classList.remove('hidden');
-                document.getElementById('disclaimer-modal').classList.add('flex');
-            }
-        }
-
-        function acceptDisclaimer() {
-            localStorage.setItem('portal_disclaimer_accepted', 'true');
-            document.getElementById('disclaimer-modal').classList.add('hidden');
-            document.getElementById('disclaimer-modal').classList.remove('flex');
-        }
-
-        // --- NETWORK STATUS ---
-        function checkNetworkStatus() {
-            const statusEl = document.getElementById('connection-status');
-            const updateStatus = () => {
-                if (navigator.onLine) {
-                    statusEl.textContent = 'Online';
-                    statusEl.className = 'bg-green-500 text-[10px] px-2 py-1.5 rounded-full text-white font-bold uppercase';
-                } else {
-                    statusEl.textContent = 'Modo Offline';
-                    statusEl.className = 'bg-red-500 text-[10px] px-2 py-1.5 rounded-full text-white font-bold uppercase';
-                }
-            };
-            window.addEventListener('online', updateStatus);
-            window.addEventListener('offline', updateStatus);
-            updateStatus();
-        }
-
-        // --- NAVIGATION ---
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-red-500');
-                btn.classList.add('text-slate-500');
-            });
-            document.querySelector(`[data-tab="${tabId}"]`).classList.add('text-red-500');
-        }
-
-        // --- MOCHILA LOGIC ---
-        function initBackpack() {
-            const container = document.getElementById('checklist-container');
-            const savedState = JSON.parse(localStorage.getItem('portal_backpack') || '{}');
-
-            backpackData.forEach((section, sIdx) => {
-                const sectionDiv = document.createElement('div');
-                sectionDiv.innerHTML = `<h3 class="font-bold text-slate-400 text-sm mb-2 uppercase">${section.cat}</h3>`;
-                const list = document.createElement('div');
-                list.className = "space-y-2";
-
-                section.items.forEach((item, iIdx) => {
-                    const id = `item-${sIdx}-${iIdx}`;
-                    const isChecked = savedState[id] ? 'checked' : '';
-                    list.innerHTML += `
-                        <label class="flex items-center gap-3 bg-slate-700/30 p-3 rounded-lg cursor-pointer hover:bg-slate-700 transition">
-                            <input type="checkbox" id="${id}" ${isChecked} onchange="saveBackpack()" class="w-5 h-5 accent-red-500 rounded">
-                            <span class="text-sm">${item}</span>
-                        </label>
-                    `;
-                });
-                sectionDiv.appendChild(list);
-                container.appendChild(sectionDiv);
-            });
-            updateProgress();
-        }
-
-        function saveBackpack() {
-            const checkboxes = document.querySelectorAll('#checklist-container input[type="checkbox"]');
-            const state = {};
-            checkboxes.forEach(cb => state[cb.id] = cb.checked);
-            localStorage.setItem('portal_backpack', JSON.stringify(state));
-            updateProgress();
-        }
-
-        function updateProgress() {
-            const checkboxes = document.querySelectorAll('#checklist-container input[type="checkbox"]');
-            const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
-            const percent = (checked / checkboxes.length) * 100;
-            document.getElementById('backpack-progress').style.width = `${percent}%`;
-        }
-
-        // --- RADIO 333 LOGIC ---
-        function startRadioTimer() {
-            function update() {
-                const now = new Date();
-                const nextWindow = new Date();
-                
-                const hours = now.getHours();
-                const nextHour = Math.ceil((hours + 0.01) / 3) * 3;
-                
-                nextWindow.setHours(nextHour % 24, 0, 0, 0);
-                if (nextHour >= 24) nextWindow.setDate(now.getDate() + 1);
-
-                const diff = nextWindow - now;
-                const h = Math.floor(diff / 3600000);
-                const m = Math.floor((diff % 3600000) / 60000);
-                const s = Math.floor((diff % 60000) / 1000);
-
-                document.getElementById('radio-timer').innerText = 
-                    `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                
-                const isWindow = (hours % 3 === 0 && now.getMinutes() < 3);
-                const statusEl = document.getElementById('radio-status');
-                if (isWindow) {
-                    statusEl.innerText = "¡TRANSMITIENDO! (Batería ON)";
-                    statusEl.className = "text-sm font-bold text-green-500 uppercase px-3 py-1 bg-green-500/20 rounded-full animate-pulse";
-                } else {
-                    statusEl.innerText = "ESCUCHA (Batería OFF)";
-                    statusEl.className = "text-sm font-bold text-yellow-500 uppercase px-3 py-1 bg-yellow-500/20 rounded-full";
-                }
-            }
-            setInterval(update, 1000);
-            update();
-        }
-
-        // --- S.O.S GENERATOR LOGIC ---
-        let sosActive = false;
-        let audioContext = null;
-        let oscillator = null;
-        
-        const UNIT = 200; 
-        const DOT = UNIT;
-        const DASH = UNIT * 3;
-        const SYMBOL_GAP = UNIT;
-        const LETTER_GAP = UNIT * 3;
-        const WORD_GAP = UNIT * 7;
-
-        const sosPattern = [
-            DOT, SYMBOL_GAP, DOT, SYMBOL_GAP, DOT, LETTER_GAP,
-            DASH, SYMBOL_GAP, DASH, SYMBOL_GAP, DASH, LETTER_GAP,
-            DOT, SYMBOL_GAP, DOT, SYMBOL_GAP, DOT, WORD_GAP
-        ];
-
-        const sleep = ms => new Promise(r => setTimeout(r, ms));
-
-        async function toggleSOS() {
-            const btn = document.getElementById('btn-toggle-sos');
-            sosActive = !sosActive;
-
-            if (sosActive) {
-                btn.innerText = "DETENER S.O.S";
-                btn.classList.replace('bg-red-600', 'bg-slate-700');
-                btn.classList.replace('hover:bg-red-500', 'hover:bg-slate-600');
-                
-                if (document.getElementById('sos-sound-toggle').checked) {
-                    if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                    if (audioContext.state === 'suspended') await audioContext.resume();
-                }
-                
-                runSOSLoop();
-            } else {
-                btn.innerText = "INICIAR S.O.S";
-                btn.classList.replace('bg-slate-700', 'bg-red-600');
-                btn.classList.replace('hover:bg-slate-600', 'hover:bg-red-500');
-                stopSignal();
-            }
-        }
-
-        async function runSOSLoop() {
-            const overlay = document.getElementById('sos-flash-overlay');
-            const useLight = document.getElementById('sos-light-toggle').checked;
-            const useSound = document.getElementById('sos-sound-toggle').checked;
-
-            while (sosActive) {
-                for (let i = 0; i < sosPattern.length; i += 2) {
-                    if (!sosActive) break;
-                    
-                    let onDuration = sosPattern[i];
-                    let offDuration = sosPattern[i+1];
-
-                    if (useLight) overlay.style.display = 'block';
-                    if (useSound && audioContext) startBeep();
-                    
-                    await sleep(onDuration);
-
-                    if (useLight) overlay.style.display = 'none';
-                    if (useSound) stopBeep();
-
-                    await sleep(offDuration);
-                }
-            }
-            stopSignal();
-        }
-
-        function startBeep() {
-            if (!audioContext) return;
-            oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            oscillator.type = 'sine';
-            oscillator.frequency.value = 800;
-            
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.01);
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            oscillator.start();
-        }
-
-        function stopBeep() {
-            if (oscillator) {
-                oscillator.stop();
-                oscillator.disconnect();
-                oscillator = null;
-            }
-        }
-
-        function stopSignal() {
-            document.getElementById('sos-flash-overlay').style.display = 'none';
-            stopBeep();
-        }
-
-        // --- PWA SERVICE WORKER REGISTRATION ---
-        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:')) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => console.log('ServiceWorker registrado con éxito'))
-                    .catch(err => console.error('Error al registrar el ServiceWorker:', err));
-            });
-        } else {
-            console.log('Service Worker no registrado: Entorno no compatible.');
-        }
-    </script>
-</body>
-</html>
+// Activación: Limpieza de cachés antiguas para purgar memoria
+self.addEventListener('activate', event => {
+  const cacheAllowlist = [CACHE_NAME];
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (!cacheAllowlist.includes(cacheName)) {
+            console.log('[Service Worker] Purgando caché obsoleta:', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  // Reclama el control de las páginas abiertas inmediatamente
+  return self.clients.claim();
+});
