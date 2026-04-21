@@ -13,7 +13,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -723,9 +723,6 @@
                     <button onclick="locateUser()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all hover:opacity-90 active:scale-95" style="background: var(--accent-blue);">
                         <i data-lucide="crosshair" class="w-4 h-4"></i> Localizarme
                     </button>
-                    <button id="btn-download-map" onclick="downloadMap()" disabled class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all opacity-50 cursor-not-allowed active:scale-95" style="background: var(--accent-green);">
-                        <i data-lucide="download" class="w-4 h-4"></i> Descargar Mapa
-                    </button>
                     <button id="btn-gmaps" onclick="openInGoogleMaps()" disabled class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all opacity-50 cursor-not-allowed active:scale-95 border" style="background: var(--bg-item); color: var(--text-primary); border-color: var(--border-color);">
                         <i data-lucide="external-link" class="w-4 h-4"></i> Abrir en Google Maps
                     </button>
@@ -741,10 +738,30 @@
                     <div id="leaflet-map"></div>
                 </div>
 
+                <!-- Mapa descargable desplegable -->
+                <details class="mt-4 rounded-xl border overflow-hidden group" style="background: var(--bg-item); border-color: var(--border-color);">
+                    <summary class="font-semibold flex items-center justify-between p-4 cursor-pointer select-none text-sm" style="color: var(--text-secondary);">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--accent-green); opacity: 0.15;">
+                                <i data-lucide="map" class="w-4 h-4" style="color: var(--accent-green);"></i>
+                            </div>
+                            Ver Mapa Descargado (Offline)
+                        </div>
+                        <i data-lucide="chevron-down" class="chevron w-4 h-4" style="color: var(--text-muted);"></i>
+                    </summary>
+                    <div class="p-4 pt-0 border-t" style="border-color: var(--border-color);">
+                        <img src="descargarmapa.jpg" alt="Mapa descargado de tu zona" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="hidden flex-col items-center gap-2 py-8" style="color: var(--text-muted);">
+                            <i data-lucide="image-off" class="w-8 h-8"></i>
+                            <span class="text-sm text-center">No se encontró 'descargarmapa.jpg'.<br>Coloca tu imagen de mapa en la misma carpeta.</span>
+                        </div>
+                    </div>
+                </details>
+
                 <div class="mt-4 p-4 rounded-xl border flex items-start gap-3" style="background: var(--bg-item); border-color: var(--border-color);">
                     <i data-lucide="info" class="w-5 h-5 flex-shrink-0 mt-0.5" style="color: var(--accent-blue);"></i>
                     <p class="text-xs leading-relaxed" style="color: var(--text-secondary);">
-                        <strong style="color: var(--text-primary);">Consejo:</strong> Haz zoom a tu zona exacta antes de descargar. La imagen se guardará en tu galería. Para uso offline real, considera descargar mapas desde la app oficial de Google Maps.
+                        <strong style="color: var(--text-primary);">Consejo:</strong> Descarga un mapa de tu zona desde Google Maps y guárdalo como <code class="px-1.5 py-0.5 rounded text-[10px] font-mono" style="background: var(--bg-body); color: var(--accent-blue);">descargarmapa.jpg</code> en la misma carpeta que esta app. Así podrás consultarlo sin conexión.
                     </p>
                 </div>
             </div>
@@ -1130,8 +1147,6 @@
                     statusEl.style.color = 'var(--accent-green)';
                     loader.classList.add('hidden');
                     
-                    document.getElementById('btn-download-map').disabled = false;
-                    document.getElementById('btn-download-map').classList.remove('opacity-50', 'cursor-not-allowed');
                     document.getElementById('btn-gmaps').disabled = false;
                     document.getElementById('btn-gmaps').classList.remove('opacity-50', 'cursor-not-allowed');
                 },
@@ -1163,33 +1178,6 @@
 
             mapMarker = L.marker([lat, lng]).addTo(map)
                 .bindPopup("<b>Tu ubicación</b>").openPopup();
-        }
-
-        function downloadMap() {
-            if (!map) return;
-            const statusEl = document.getElementById('map-status');
-            statusEl.textContent = "Generando imagen, espera...";
-            statusEl.style.color = 'var(--accent-blue)';
-
-            const mapEl = document.getElementById('leaflet-map');
-            
-            html2canvas(mapEl, {
-                useCORS: true,
-                allowTaint: true,
-                backgroundColor: null,
-                scale: 2
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `mapa-emergencia-${new Date().toISOString().slice(0,10)}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-                statusEl.textContent = "¡Mapa descargado correctamente!";
-                statusEl.style.color = 'var(--accent-green)';
-            }).catch(err => {
-                console.error(err);
-                statusEl.textContent = "No se pudo generar la imagen. Intenta hacer una captura de pantalla manual.";
-                statusEl.style.color = 'var(--accent-red)';
-            });
         }
 
         function openInGoogleMaps() {
