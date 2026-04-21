@@ -2,61 +2,330 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#dc2626">
     <title>Portal de Emergencia Integral</title>
     
-    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .emergency-glow { animation: pulse 2s infinite; }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        :root {
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-item: #f8fafc;
+            --bg-header: linear-gradient(135deg, #b91c1c 0%, #dc2626 50%, #ef4444 100%);
+            --bg-nav: rgba(255,255,255,0.85);
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: #e2e8f0;
+            --border-strong: #cbd5e1;
+            --shadow-color: rgba(0,0,0,0.08);
+            --accent-red: #dc2626;
+            --accent-red-light: #ef4444;
+            --accent-red-glow: rgba(220,38,38,0.25);
+            --accent-green: #16a34a;
+            --accent-yellow: #d97706;
+            --accent-blue: #2563eb;
+            --accent-orange: #ea580c;
+            --overlay-bg: rgba(255,255,255,0.95);
         }
+
+        .dark {
+            --bg-body: #0b1120;
+            --bg-card: #1e293b;
+            --bg-item: #334155;
+            --bg-header: linear-gradient(135deg, #7f1d1d 0%, #991b1b 50%, #b91c1c 100%);
+            --bg-nav: rgba(15,23,42,0.9);
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border-color: #334155;
+            --border-strong: #475569;
+            --shadow-color: rgba(0,0,0,0.4);
+            --accent-red: #ef4444;
+            --accent-red-light: #f87171;
+            --accent-red-glow: rgba(239,68,68,0.4);
+            --accent-green: #22c55e;
+            --accent-yellow: #fbbf24;
+            --accent-blue: #60a5fa;
+            --accent-orange: #fb923c;
+            --overlay-bg: rgba(15,23,42,0.97);
+        }
+
+        * { -webkit-tap-highlight-color: transparent; }
+        html, body { font-family: 'Inter', sans-serif; }
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .tab-content { display: none; animation: fadeIn 0.35s ease-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .glass {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 24px var(--shadow-color);
+            transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .glass-strong {
+            background: var(--bg-card);
+            border: 1px solid var(--border-strong);
+            box-shadow: 0 8px 32px var(--shadow-color);
+            transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .emergency-glow { animation: pulseGlow 2s infinite; }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 0 0 var(--accent-red-glow); }
+            70% { box-shadow: 0 0 0 16px transparent; }
+            100% { box-shadow: 0 0 0 0 transparent; }
+        }
+
         #sos-flash-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background-color: white;
+            background: radial-gradient(circle at center, #fff 0%, #fee2e2 40%, transparent 80%);
             z-index: 9999;
+            pointer-events: none;
         }
-        details > summary i.lucide-chevron-down {
-            transition: transform 0.2s ease-in-out;
+        .dark #sos-flash-overlay {
+            background: radial-gradient(circle at center, #fff 0%, #fee2e2 30%, transparent 70%);
         }
-        details[open] > summary i.lucide-chevron-down {
+
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: var(--accent-red-glow);
+            animation: rippleAnim 1.5s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes rippleAnim {
+            0% { width: 0; height: 0; opacity: 0.8; }
+            100% { width: 300px; height: 300px; opacity: 0; }
+        }
+
+        details > summary .chevron {
+            transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+        }
+        details[open] > summary .chevron {
             transform: rotate(180deg);
         }
-        details summary::-webkit-details-marker {
-            display:none;
+        details summary::-webkit-details-marker { display:none; }
+
+        .check-custom {
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--border-strong);
+            border-radius: 6px;
+            background: var(--bg-item);
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .check-custom:checked {
+            background: var(--accent-red);
+            border-color: var(--accent-red);
+            box-shadow: 0 0 8px var(--accent-red-glow);
+        }
+        .check-custom:checked::after {
+            content: '';
+            position: absolute;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2.5px 2.5px 0;
+            transform: rotate(45deg);
+        }
+
+        .switch-toggle {
+            appearance: none;
+            width: 52px;
+            height: 28px;
+            background: var(--border-strong);
+            border-radius: 14px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .switch-toggle::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+        .switch-toggle:checked {
+            background: var(--accent-red);
+        }
+        .switch-toggle:checked::after {
+            transform: translateX(24px);
+        }
+
+        .nav-indicator {
+            position: absolute;
+            bottom: 0;
+            height: 3px;
+            background: var(--accent-red);
+            border-radius: 3px 3px 0 0;
+            transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        .morse-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--border-strong);
+            transition: all 0.15s ease;
+        }
+        .morse-indicator.active {
+            background: var(--accent-red);
+            box-shadow: 0 0 10px var(--accent-red-glow);
+            transform: scale(1.4);
+        }
+
+        .theme-transition {
+            transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+        }
+
+        #leaflet-map { height: 380px; width: 100%; border-radius: 16px; z-index: 1; }
+        .leaflet-container { background: var(--bg-item) !important; }
+
+        .stagger-in > * {
+            animation: staggerFade 0.4s ease-out backwards;
+        }
+        .stagger-in > *:nth-child(1) { animation-delay: 0.05s; }
+        .stagger-in > *:nth-child(2) { animation-delay: 0.10s; }
+        .stagger-in > *:nth-child(3) { animation-delay: 0.15s; }
+        .stagger-in > *:nth-child(4) { animation-delay: 0.20s; }
+        .stagger-in > *:nth-child(5) { animation-delay: 0.25s; }
+        .stagger-in > *:nth-child(6) { animation-delay: 0.30s; }
+        @keyframes staggerFade {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bg-gradient-header {
+            background: var(--bg-header);
+        }
+
+        .text-theme-primary { color: var(--text-primary); }
+        .text-theme-secondary { color: var(--text-secondary); }
+        .text-theme-muted { color: var(--text-muted); }
+        .border-theme { border-color: var(--border-color); }
+        .bg-theme-card { background-color: var(--bg-card); }
+        .bg-theme-item { background-color: var(--bg-item); }
+
+        /* Notas */
+        .note-card {
+            transition: all 0.25s ease;
+            animation: noteAppear 0.3s ease-out;
+        }
+        .note-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--shadow-color);
+        }
+        @keyframes noteAppear {
+            from { opacity: 0; transform: scale(0.95) translateY(8px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .note-card.removing {
+            animation: noteRemove 0.25s ease-in forwards;
+        }
+        @keyframes noteRemove {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.9) translateX(-20px); }
+        }
+        .note-priority-high { border-left: 4px solid var(--accent-red); }
+        .note-priority-medium { border-left: 4px solid var(--accent-yellow); }
+        .note-priority-low { border-left: 4px solid var(--accent-green); }
+
+        .priority-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .priority-btn:hover { transform: scale(1.15); }
+        .priority-btn.selected { border-color: var(--text-primary); box-shadow: 0 0 0 2px var(--bg-body), 0 0 0 4px var(--text-primary); }
+        .priority-btn-high { background: var(--accent-red); }
+        .priority-btn-medium { background: var(--accent-yellow); }
+        .priority-btn-low { background: var(--accent-green); }
+
+        .note-input {
+            background: var(--bg-item);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+        .note-input:focus {
+            outline: none;
+            border-color: var(--accent-red);
+            box-shadow: 0 0 0 3px var(--accent-red-glow);
+        }
+        .note-input::placeholder { color: var(--text-muted); }
+
+        .note-textarea {
+            background: transparent;
+            color: var(--text-primary);
+            border: none;
+            resize: none;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            outline: none;
         }
     </style>
 </head>
-<body class="pb-20">
+<body class="pb-24">
 
     <!-- AVISO LEGAL MODAL -->
-    <div id="disclaimer-modal" class="fixed inset-0 bg-slate-900/95 z-[10000] hidden items-center justify-center p-4 backdrop-blur-sm">
-        <div class="bg-slate-800 border border-red-600 rounded-2xl p-6 max-w-md w-full shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1 bg-red-600"></div>
-            <div class="mx-auto bg-red-900/30 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                <i data-lucide="alert-triangle" class="text-red-500 w-8 h-8"></i>
+    <div id="disclaimer-modal" class="fixed inset-0 z-[10000] hidden items-center justify-center p-4" style="background: var(--overlay-bg); backdrop-filter: blur(12px);">
+        <div class="glass-strong rounded-2xl p-6 max-w-md w-full relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-1 bg-red-500"></div>
+            <div class="mx-auto w-16 h-16 rounded-full flex items-center justify-center mb-4" style="background: var(--accent-red-glow);">
+                <i data-lucide="alert-triangle" class="w-8 h-8" style="color: var(--accent-red);"></i>
             </div>
-            <h2 class="text-xl font-bold text-center text-white uppercase tracking-wider mb-4">Advertencia Legal Crítica</h2>
-            <div class="text-sm text-slate-300 space-y-3 mb-6">
+            <h2 class="text-xl font-bold text-center uppercase tracking-wider mb-4" style="color: var(--text-primary);">Advertencia Legal Crítica</h2>
+            <div class="text-sm space-y-3 mb-6" style="color: var(--text-secondary);">
                 <p>Esta aplicación es una <strong>versión de pruebas en fase de desarrollo</strong>. Los protocolos y guías aquí descritos tienen un carácter puramente informativo.</p>
                 <p>Toda la responsabilidad derivada del uso de esta herramienta, así como de la ejecución de cualquier maniobra de primeros auxilios o protocolo de emergencia, <strong>recae exclusiva y totalmente sobre el usuario</strong>.</p>
-                <p class="text-red-400 font-bold">Consulte siempre con el 112 y con los servicios de emergencia profesionales autorizados.</p>
+                <p style="color: var(--accent-red);">Consulte siempre con el 112 y con los servicios de emergencia profesionales autorizados.</p>
             </div>
-            <button onclick="acceptDisclaimer()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-xl uppercase tracking-widest transition-colors flex justify-center items-center gap-2">
+            <button onclick="acceptDisclaimer()" class="w-full font-bold py-3 px-4 rounded-xl uppercase tracking-widest transition-all flex justify-center items-center gap-2 text-white" style="background: var(--accent-red);" onmouseover="this.style.background='var(--accent-red-light)'" onmouseout="this.style.background='var(--accent-red)'">
                 <i data-lucide="check-circle" class="w-5 h-5"></i> Acepto la Responsabilidad
             </button>
         </div>
@@ -66,19 +335,24 @@
     <div id="sos-flash-overlay"></div>
 
     <!-- Header -->
-    <header class="bg-red-700 p-4 sticky top-0 z-50 shadow-lg">
+    <header class="bg-gradient-header p-4 sticky top-0 z-50 shadow-lg">
         <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <i data-lucide="shield-alert" class="text-white w-8 h-8"></i>
-                <h1 class="font-bold text-xl uppercase tracking-tighter hidden sm:block">Portal Emergencia</h1>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+                    <i data-lucide="shield-alert" class="text-white w-6 h-6"></i>
+                </div>
+                <h1 class="font-bold text-lg uppercase tracking-tight text-white hidden sm:block">Portal Emergencia</h1>
             </div>
-            <div class="flex items-center gap-2">
-                <!-- Botón de instalación (oculto por defecto) -->
-                <button id="btn-install" class="hidden bg-white text-red-700 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase flex items-center gap-1 shadow-md hover:bg-slate-200 transition-colors">
-                    <i data-lucide="download" class="w-3 h-3"></i> Instalar App
+            <div class="flex items-center gap-3">
+                <button id="theme-toggle" onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center text-white hover:bg-white/30 transition-all" title="Cambiar tema">
+                    <i data-lucide="sun" id="theme-icon-sun" class="w-5 h-5"></i>
+                    <i data-lucide="moon" id="theme-icon-moon" class="w-5 h-5 hidden"></i>
                 </button>
-                <div id="connection-status" class="bg-green-500 text-[10px] px-2 py-1.5 rounded-full text-white font-bold uppercase">
-                    Online
+                <button id="btn-install" class="hidden bg-white text-red-700 text-[10px] px-3 py-1.5 rounded-full font-bold uppercase items-center gap-1 shadow-md hover:bg-slate-200 transition-colors">
+                    <i data-lucide="download" class="w-3 h-3"></i> Instalar
+                </button>
+                <div id="connection-status" class="text-[10px] px-3 py-1.5 rounded-full text-white font-bold uppercase flex items-center gap-1.5" style="background: var(--accent-green);">
+                    <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span> Online
                 </div>
             </div>
         </div>
@@ -88,328 +362,528 @@
         
         <!-- SECTION: MOCHILA 72H -->
         <section id="backpack" class="tab-content active space-y-6">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                <h2 class="text-2xl font-bold flex items-center gap-2 mb-4">
-                    <i data-lucide="package" class="text-red-500"></i> Mochila de 72 Horas
-                </h2>
-                <div class="w-full bg-slate-700 h-4 rounded-full mb-4 overflow-hidden">
-                    <div id="backpack-progress" class="bg-green-500 h-full transition-all duration-500" style="width: 0%"></div>
+            <div class="glass-strong p-6 rounded-2xl">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: var(--accent-red-glow);">
+                        <i data-lucide="package" style="color: var(--accent-red);" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold" style="color: var(--text-primary);">Mochila de 72 Horas</h2>
+                        <p class="text-xs" style="color: var(--text-muted);">Kit de supervivencia esencial</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="flex-1 h-3 rounded-full overflow-hidden" style="background: var(--bg-item); border: 1px solid var(--border-color);">
+                        <div id="backpack-progress" class="h-full rounded-full transition-all duration-700 ease-out" style="width: 0%; background: var(--accent-green); box-shadow: 0 0 8px rgba(34,197,94,0.4);"></div>
+                    </div>
+                    <span id="backpack-percent" class="text-sm font-bold font-mono" style="color: var(--accent-green);">0%</span>
                 </div>
 
-                <!-- Infografía Mochila -->
-                <details class="bg-slate-700/40 rounded-xl group border border-slate-600 mb-6">
-                    <summary class="font-bold flex items-center justify-between p-3 cursor-pointer select-none text-sm">
-                        <div class="flex items-center gap-2"><i data-lucide="image" class="w-4 h-4 text-blue-400"></i> Ver Infografía Guía</div>
-                        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                <details class="rounded-xl group border mb-6 overflow-hidden" style="background: var(--bg-item); border-color: var(--border-color);">
+                    <summary class="font-semibold flex items-center justify-between p-3.5 cursor-pointer select-none text-sm" style="color: var(--text-secondary);">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--accent-blue); opacity: 0.15;">
+                                <i data-lucide="image" class="w-4 h-4" style="color: var(--accent-blue);"></i>
+                            </div>
+                            Ver Infografía Guía
+                        </div>
+                        <i data-lucide="chevron-down" class="chevron w-4 h-4" style="color: var(--text-muted);"></i>
                     </summary>
-                    <div class="p-3 pt-0 border-t border-slate-600/50 mt-2">
-                        <img src="mochila.jpg" alt="Suministros Esenciales" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'mochila.jpg' no encontrada.</p>
+                    <div class="p-3 pt-0 border-t" style="border-color: var(--border-color);">
+                        <img src="mochila.jpg" alt="Suministros Esenciales" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="hidden items-center gap-2 py-8 justify-center" style="color: var(--text-muted);">
+                            <i data-lucide="image-off" class="w-5 h-5"></i>
+                            <span class="text-sm">Imagen 'mochila.jpg' no encontrada</span>
+                        </div>
                     </div>
                 </details>
                 
-                <div id="checklist-container" class="space-y-4">
-                    <!-- Categorías se generarán por JS -->
+                <div id="checklist-container" class="space-y-5 stagger-in">
                 </div>
             </div>
         </section>
 
         <!-- SECTION: PLAN 333 -->
         <section id="radio" class="tab-content space-y-6">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                <h2 class="text-2xl font-bold flex items-center justify-center gap-2 mb-4">
-                    <i data-lucide="radio" class="text-red-500"></i> Protocolo Plan 333
-                </h2>
+            <div class="glass-strong p-6 rounded-2xl">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: var(--accent-red-glow);">
+                        <i data-lucide="radio" style="color: var(--accent-red);" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold" style="color: var(--text-primary);">Protocolo Plan 333</h2>
+                        <p class="text-xs" style="color: var(--text-muted);">Comunicación táctica de emergencia</p>
+                    </div>
+                </div>
                 
-                <p class="text-slate-300 text-sm mb-4 leading-relaxed">
-                    El <strong>Plan 333</strong> es un estándar táctico para comunicaciones en escenarios de aislamiento (*Grid-Down*). Consiste en encender los equipos de radio en el <strong>Canal 3</strong>, cada <strong>3 horas</strong>, durante solo <strong>3 minutos</strong> para preservar la batería de los transmisores al máximo.
+                <p class="text-sm mb-5 leading-relaxed" style="color: var(--text-secondary);">
+                    El <strong style="color: var(--text-primary);">Plan 333</strong> es un estándar táctico para comunicaciones en escenarios de aislamiento. Consiste en encender los equipos de radio en el <strong style="color: var(--text-primary);">Canal 3</strong>, cada <strong style="color: var(--text-primary);">3 horas</strong>, durante solo <strong style="color: var(--text-primary);">3 minutos</strong>.
                 </p>
 
-                <!-- Infografía Plan 333 -->
-                <details class="bg-slate-700/40 rounded-xl group border border-slate-600 mb-6">
-                    <summary class="font-bold flex items-center justify-between p-3 cursor-pointer select-none text-sm">
-                        <div class="flex items-center gap-2"><i data-lucide="image" class="w-4 h-4 text-blue-400"></i> Ver Infografía Operativa</div>
-                        <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                <details class="rounded-xl group border mb-6 overflow-hidden" style="background: var(--bg-item); border-color: var(--border-color);">
+                    <summary class="font-semibold flex items-center justify-between p-3.5 cursor-pointer select-none text-sm" style="color: var(--text-secondary);">
+                        <div class="flex items-center gap-2">
+                            <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--accent-blue); opacity: 0.15;">
+                                <i data-lucide="image" class="w-4 h-4" style="color: var(--accent-blue);"></i>
+                            </div>
+                            Ver Infografía Operativa
+                        </div>
+                        <i data-lucide="chevron-down" class="chevron w-4 h-4" style="color: var(--text-muted);"></i>
                     </summary>
-                    <div class="p-3 pt-0 border-t border-slate-600/50 mt-2">
-                        <img src="plan333.jpg" alt="Guía del Plan 333" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'plan333.jpg' no encontrada.</p>
+                    <div class="p-3 pt-0 border-t" style="border-color: var(--border-color);">
+                        <img src="plan333.jpg" alt="Guía del Plan 333" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        <div class="hidden items-center gap-2 py-8 justify-center" style="color: var(--text-muted);">
+                            <i data-lucide="image-off" class="w-5 h-5"></i>
+                            <span class="text-sm">Imagen 'plan333.jpg' no encontrada</span>
+                        </div>
                     </div>
                 </details>
                 
-                <div class="bg-slate-900 rounded-xl p-6 border-2 border-red-900 emergency-glow text-center mb-6">
-                    <div class="text-xs uppercase text-slate-500 mb-2">Próxima Ventana Activa en:</div>
-                    <div id="radio-timer" class="text-5xl font-mono font-bold text-red-500">00:00:00</div>
+                <div class="rounded-xl p-6 border-2 emergency-glow text-center mb-6" style="background: var(--bg-item); border-color: var(--accent-red);">
+                    <div class="text-xs uppercase mb-2" style="color: var(--text-muted);">Próxima Ventana Activa en:</div>
+                    <div id="radio-timer" class="text-5xl font-mono font-bold" style="color: var(--accent-red);">00:00:00</div>
                     <div class="mt-3">
-                        <span id="radio-status" class="text-sm font-bold text-yellow-500 uppercase px-3 py-1 bg-yellow-500/20 rounded-full">ESCUCHA (Batería OFF)</span>
+                        <span id="radio-status" class="text-sm font-bold uppercase px-4 py-1.5 rounded-full">ESCUCHA (Batería OFF)</span>
                     </div>
                 </div>
 
                 <div class="space-y-4">
-                    <!-- Frecuencias -->
                     <div class="grid grid-cols-2 gap-3">
-                        <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600">
-                            <span class="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">PMR446 (Walkies)</span>
-                            <span class="block font-bold text-lg text-white">Canal 3</span>
-                            <span class="block font-mono text-xs text-slate-300 mt-1">446.031 MHz</span>
+                        <div class="p-4 rounded-xl border" style="background: var(--bg-item); border-color: var(--border-color);">
+                            <span class="block text-[10px] uppercase tracking-widest mb-1" style="color: var(--text-muted);">PMR446 (Walkies)</span>
+                            <span class="block font-bold text-lg" style="color: var(--text-primary);">Canal 3</span>
+                            <span class="block font-mono text-xs mt-1" style="color: var(--text-secondary);">446.031 MHz</span>
                         </div>
-                        <div class="bg-slate-700/50 p-4 rounded-xl border border-slate-600">
-                            <span class="block text-[10px] text-slate-400 uppercase tracking-widest mb-1">CB-27 (Emisoras)</span>
-                            <span class="block font-bold text-lg text-white">Canal 3</span>
-                            <span class="block font-mono text-xs text-slate-300 mt-1">26.985 MHz (AM/FM)</span>
+                        <div class="p-4 rounded-xl border" style="background: var(--bg-item); border-color: var(--border-color);">
+                            <span class="block text-[10px] uppercase tracking-widest mb-1" style="color: var(--text-muted);">CB-27 (Emisoras)</span>
+                            <span class="block font-bold text-lg" style="color: var(--text-primary);">Canal 3</span>
+                            <span class="block font-mono text-xs mt-1" style="color: var(--text-secondary);">26.985 MHz (AM/FM)</span>
                         </div>
                     </div>
 
-                    <!-- Alerta Canal 9 -->
-                    <div class="bg-red-950/50 border border-red-800 p-4 rounded-xl flex items-start gap-3">
-                        <i data-lucide="alert-triangle" class="text-red-500 w-6 h-6 flex-shrink-0 mt-0.5"></i>
+                    <div class="p-4 rounded-xl border flex items-start gap-3" style="background: var(--accent-red-glow); border-color: var(--accent-red); opacity: 0.9;">
+                        <i data-lucide="alert-triangle" class="w-6 h-6 flex-shrink-0 mt-0.5" style="color: var(--accent-red);"></i>
                         <div>
-                            <span class="block font-bold text-red-500 uppercase tracking-wide text-sm mb-1">Canal 9 de Emergencias (CB)</span>
-                            <span class="text-xs text-slate-300 leading-relaxed">
-                                En equipos CB-27, el <strong>Canal 9 (27.065 MHz)</strong> está reservado internacionalmente <strong>SÓLO para emergencias reales</strong> (riesgo vital, accidentes). No utilice este canal para conversaciones rutinarias.
+                            <span class="block font-bold uppercase tracking-wide text-sm mb-1" style="color: var(--accent-red);">Canal 9 de Emergencias (CB)</span>
+                            <span class="text-xs leading-relaxed" style="color: var(--text-secondary);">
+                                En equipos CB-27, el <strong style="color: var(--text-primary);">Canal 9 (27.065 MHz)</strong> está reservado internacionalmente <strong>SÓLO para emergencias reales</strong> (riesgo vital, accidentes). No utilice este canal para conversaciones rutinarias.
                             </span>
                         </div>
                     </div>
 
-                    <!-- Protocolo de Transmisión -->
-                    <div class="bg-slate-700/30 border border-slate-600 p-5 rounded-xl">
-                        <h3 class="text-blue-400 font-bold uppercase text-xs mb-3 tracking-widest flex items-center gap-2">
+                    <div class="p-5 rounded-xl border" style="background: var(--bg-item); border-color: var(--border-color);">
+                        <h3 class="font-bold uppercase text-xs mb-3 tracking-widest flex items-center gap-2" style="color: var(--accent-blue);">
                             <i data-lucide="mic" class="w-4 h-4"></i> Qué decir al transmitir
                         </h3>
-                        <p class="text-xs text-slate-400 mb-3 italic">Antes de presionar el botón (PTT), escuche 10 segundos. Si el canal está libre, transmita:</p>
-                        <ul class="text-sm text-slate-200 space-y-2">
-                            <li><strong class="text-white">1. Identificación:</strong> Quién es usted y tamaño de su grupo.</li>
-                            <li><strong class="text-white">2. Ubicación:</strong> Coordenadas GPS, calle exacta o puntos de referencia visuales inconfundibles.</li>
-                            <li><strong class="text-white">3. Situación:</strong> Qué ocurre de forma breve (herido grave, sin agua, fuego).</li>
-                            <li><strong class="text-white">4. Necesidad:</strong> Qué ayuda específica y urgente requiere.</li>
+                        <p class="text-xs italic mb-3" style="color: var(--text-muted);">Antes de presionar el botón (PTT), escuche 10 segundos. Si el canal está libre, transmita:</p>
+                        <ul class="text-sm space-y-2" style="color: var(--text-secondary);">
+                            <li><strong style="color: var(--text-primary);">1. Identificación:</strong> Quién es usted y tamaño de su grupo.</li>
+                            <li><strong style="color: var(--text-primary);">2. Ubicación:</strong> Coordenadas GPS, calle exacta o puntos de referencia.</li>
+                            <li><strong style="color: var(--text-primary);">3. Situación:</strong> Qué ocurre de forma breve.</li>
+                            <li><strong style="color: var(--text-primary);">4. Necesidad:</strong> Qué ayuda específica y urgente requiere.</li>
                         </ul>
                     </div>
                 </div>
-
             </div>
         </section>
 
         <!-- SECTION: PRIMEROS AUXILIOS -->
         <section id="aid" class="tab-content space-y-4">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                <h2 class="text-2xl font-bold flex items-center gap-2 mb-6">
-                    <i data-lucide="plus-circle" class="text-red-500"></i> Protocolos de Vida
-                </h2>
+            <div class="glass-strong p-6 rounded-2xl">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: var(--accent-red-glow);">
+                        <i data-lucide="plus-circle" style="color: var(--accent-red);" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold" style="color: var(--text-primary);">Protocolos de Vida</h2>
+                        <p class="text-xs" style="color: var(--text-muted);">Primeros auxilios y maniobras críticas</p>
+                    </div>
+                </div>
                 
-                <!-- 1. PAS -->
+                <!-- PAS -->
                 <div class="mb-8">
-                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">1. Protocolo P.A.S.</h3>
+                    <h3 class="font-bold uppercase text-sm mb-4 tracking-widest" style="color: var(--accent-red);">1. Protocolo P.A.S.</h3>
                     <div class="grid grid-cols-3 gap-2 text-center">
-                        <div class="bg-slate-900 p-4 rounded-xl border-t-4 border-blue-500">
-                            <div class="font-bold text-2xl">P</div>
-                            <div class="text-[10px] uppercase">Proteger</div>
+                        <div class="p-4 rounded-xl border-t-4" style="background: var(--bg-item); border-color: var(--accent-blue); border-top-width: 4px;">
+                            <div class="font-bold text-2xl" style="color: var(--accent-blue);">P</div>
+                            <div class="text-[10px] uppercase" style="color: var(--text-muted);">Proteger</div>
                         </div>
-                        <div class="bg-slate-900 p-4 rounded-xl border-t-4 border-yellow-500">
-                            <div class="font-bold text-2xl">A</div>
-                            <div class="text-[10px] uppercase">Avisar</div>
+                        <div class="p-4 rounded-xl border-t-4" style="background: var(--bg-item); border-color: var(--accent-yellow); border-top-width: 4px;">
+                            <div class="font-bold text-2xl" style="color: var(--accent-yellow);">A</div>
+                            <div class="text-[10px] uppercase" style="color: var(--text-muted);">Avisar</div>
                         </div>
-                        <div class="bg-slate-900 p-4 rounded-xl border-t-4 border-red-500">
-                            <div class="font-bold text-2xl">S</div>
-                            <div class="text-[10px] uppercase">Socorrer</div>
+                        <div class="p-4 rounded-xl border-t-4" style="background: var(--bg-item); border-color: var(--accent-red); border-top-width: 4px;">
+                            <div class="font-bold text-2xl" style="color: var(--accent-red);">S</div>
+                            <div class="text-[10px] uppercase" style="color: var(--text-muted);">Socorrer</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 2. EVALUACIÓN INICIAL -->
+                <!-- Evaluación -->
                 <div class="mb-8">
-                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">2. Evaluación Inicial (Diagnóstico)</h3>
+                    <h3 class="font-bold uppercase text-sm mb-4 tracking-widest" style="color: var(--accent-red);">2. Evaluación Inicial</h3>
                     
-                    <details class="bg-slate-700/40 rounded-xl group border border-slate-600 mb-4">
-                        <summary class="font-bold flex items-center justify-between p-3 cursor-pointer select-none text-sm">
-                            <div class="flex items-center gap-2"><i data-lucide="image" class="w-4 h-4 text-blue-400"></i> Ver Infografía de Evaluación</div>
-                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                    <details class="rounded-xl group border mb-4 overflow-hidden" style="background: var(--bg-item); border-color: var(--border-color);">
+                        <summary class="font-semibold flex items-center justify-between p-3.5 cursor-pointer select-none text-sm" style="color: var(--text-secondary);">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--accent-blue); opacity: 0.15;">
+                                    <i data-lucide="image" class="w-4 h-4" style="color: var(--accent-blue);"></i>
+                                </div>
+                                Ver Infografía de Evaluación
+                            </div>
+                            <i data-lucide="chevron-down" class="chevron w-4 h-4" style="color: var(--text-muted);"></i>
                         </summary>
-                        <div class="p-3 pt-0 border-t border-slate-600/50 mt-2">
-                            <img src="evaluacion.jpg" alt="Guía de Evaluación Inicial" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                            <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'evaluacion.jpg' no encontrada.</p>
+                        <div class="p-3 pt-0 border-t" style="border-color: var(--border-color);">
+                            <img src="evaluacion.jpg" alt="Guía de Evaluación Inicial" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="hidden items-center gap-2 py-8 justify-center" style="color: var(--text-muted);">
+                                <i data-lucide="image-off" class="w-5 h-5"></i>
+                                <span class="text-sm">Imagen 'evaluacion.jpg' no encontrada</span>
+                            </div>
                         </div>
                     </details>
 
-                    <div class="bg-slate-700/30 border border-slate-600 p-5 rounded-xl space-y-3">
+                    <div class="p-5 rounded-xl border space-y-3" style="background: var(--bg-item); border-color: var(--border-color);">
                         <div class="flex items-start gap-3">
-                            <i data-lucide="brain" class="text-purple-400 w-5 h-5 flex-shrink-0 mt-0.5"></i>
-                            <p class="text-sm text-slate-200"><strong class="text-white">Comprobar Consciencia:</strong> Sacuda suavemente los hombros de la víctima y pregunte en voz alta: <em>"¿Se encuentra bien?"</em>. Si no hay respuesta, está inconsciente.</p>
+                            <i data-lucide="brain" class="w-5 h-5 flex-shrink-0 mt-0.5" style="color: var(--accent-blue);"></i>
+                            <p class="text-sm" style="color: var(--text-secondary);"><strong style="color: var(--text-primary);">Comprobar Consciencia:</strong> Sacuda suavemente los hombros y pregunte: <em>"¿Se encuentra bien?"</em></p>
                         </div>
                         <div class="flex items-start gap-3">
-                            <i data-lucide="wind" class="text-blue-400 w-5 h-5 flex-shrink-0 mt-0.5"></i>
-                            <p class="text-sm text-slate-200"><strong class="text-white">Comprobar Respiración:</strong> Incline la cabeza hacia atrás (maniobra frente-mentón) para abrir la vía aérea. <strong>Ver, Oír y Sentir</strong> si respira con normalidad durante un máximo de 10 segundos.</p>
+                            <i data-lucide="wind" class="w-5 h-5 flex-shrink-0 mt-0.5" style="color: var(--accent-blue);"></i>
+                            <p class="text-sm" style="color: var(--text-secondary);"><strong style="color: var(--text-primary);">Comprobar Respiración:</strong> Incline la cabeza hacia atrás. <strong>Ver, Oír y Sentir</strong> durante 10 segundos.</p>
                         </div>
-                        <div class="bg-red-950/50 p-3 rounded-lg border border-red-800/50 mt-2">
-                            <span class="text-xs text-red-200 font-bold uppercase">Decisión Crítica:</span><br>
-                            <span class="text-sm text-slate-300 block mt-1">
-                                • Si <strong>SÍ</strong> respira normal: Posición Lateral de Seguridad (PLS) y vigilar.<br>
-                                • Si <strong>NO</strong> respira normal: Iniciar RCP inmediatamente.
+                        <div class="p-3 rounded-lg border mt-2" style="background: var(--accent-red-glow); border-color: var(--accent-red);">
+                            <span class="text-xs font-bold uppercase" style="color: var(--accent-red);">Decisión Crítica:</span><br>
+                            <span class="text-sm block mt-1" style="color: var(--text-secondary);">
+                                • Si <strong style="color: var(--text-primary);">SÍ</strong> respira: Posición Lateral de Seguridad (PLS).<br>
+                                • Si <strong style="color: var(--text-primary);">NO</strong> respira: Iniciar RCP inmediatamente.
                             </span>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. RCP -->
+                <!-- RCP -->
                 <div class="mb-8">
-                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">3. Reanimación (RCP)</h3>
+                    <h3 class="font-bold uppercase text-sm mb-4 tracking-widest" style="color: var(--accent-red);">3. Reanimación (RCP)</h3>
                     <div class="space-y-3">
-                        <details class="bg-slate-700/40 rounded-xl group border border-slate-600">
-                            <summary class="font-bold flex items-center justify-between p-4 cursor-pointer select-none">
-                                <div class="flex items-center gap-2"><i data-lucide="user" class="w-5 h-5 text-blue-400"></i> RCP Adultos</div>
-                                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
+                        <details class="rounded-xl group border overflow-hidden" style="background: var(--bg-item); border-color: var(--border-color);">
+                            <summary class="font-semibold flex items-center justify-between p-4 cursor-pointer select-none">
+                                <div class="flex items-center gap-2" style="color: var(--text-secondary);">
+                                    <i data-lucide="user" class="w-5 h-5" style="color: var(--accent-blue);"></i> RCP Adultos
+                                </div>
+                                <i data-lucide="chevron-down" class="chevron w-5 h-5" style="color: var(--text-muted);"></i>
                             </summary>
-                            <div class="p-4 pt-0 border-t border-slate-600/50 mt-2">
-                                <img src="rcp-adultos.jpg" alt="Guía RCP Adultos" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'rcp-adultos.jpg' no encontrada.</p>
+                            <div class="p-4 pt-0 border-t" style="border-color: var(--border-color);">
+                                <img src="rcp-adultos.jpg" alt="Guía RCP Adultos" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="hidden items-center gap-2 py-8 justify-center" style="color: var(--text-muted);">
+                                    <i data-lucide="image-off" class="w-5 h-5"></i>
+                                    <span class="text-sm">Imagen 'rcp-adultos.jpg' no encontrada</span>
+                                </div>
                             </div>
                         </details>
-
-                        <details class="bg-slate-700/40 rounded-xl group border border-slate-600">
-                            <summary class="font-bold flex items-center justify-between p-4 cursor-pointer select-none">
-                                <div class="flex items-center gap-2"><i data-lucide="users" class="w-5 h-5 text-green-400"></i> RCP Niños (1 a Pubertad)</div>
-                                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
+                        <details class="rounded-xl group border overflow-hidden" style="background: var(--bg-item); border-color: var(--border-color);">
+                            <summary class="font-semibold flex items-center justify-between p-4 cursor-pointer select-none">
+                                <div class="flex items-center gap-2" style="color: var(--text-secondary);">
+                                    <i data-lucide="users" class="w-5 h-5" style="color: var(--accent-green);"></i> RCP Niños (1 a Pubertad)
+                                </div>
+                                <i data-lucide="chevron-down" class="chevron w-5 h-5" style="color: var(--text-muted);"></i>
                             </summary>
-                            <div class="p-4 pt-0 border-t border-slate-600/50 mt-2">
-                                <img src="rcp-ninos.jpg" alt="Guía RCP Niños" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'rcp-ninos.jpg' no encontrada.</p>
+                            <div class="p-4 pt-0 border-t" style="border-color: var(--border-color);">
+                                <img src="rcp-ninos.jpg" alt="Guía RCP Niños" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="hidden items-center gap-2 py-8 justify-center" style="color: var(--text-muted);">
+                                    <i data-lucide="image-off" class="w-5 h-5"></i>
+                                    <span class="text-sm">Imagen 'rcp-ninos.jpg' no encontrada</span>
+                                </div>
                             </div>
                         </details>
-
-                        <details class="bg-slate-700/40 rounded-xl group border border-slate-600">
-                            <summary class="font-bold flex items-center justify-between p-4 cursor-pointer select-none">
-                                <div class="flex items-center gap-2"><i data-lucide="baby" class="w-5 h-5 text-yellow-400"></i> RCP Lactantes (&lt; 1 año)</div>
-                                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
+                        <details class="rounded-xl group border overflow-hidden" style="background: var(--bg-item); border-color: var(--border-color);">
+                            <summary class="font-semibold flex items-center justify-between p-4 cursor-pointer select-none">
+                                <div class="flex items-center gap-2" style="color: var(--text-secondary);">
+                                    <i data-lucide="baby" class="w-5 h-5" style="color: var(--accent-yellow);"></i> RCP Lactantes (&lt; 1 año)
+                                </div>
+                                <i data-lucide="chevron-down" class="chevron w-5 h-5" style="color: var(--text-muted);"></i>
                             </summary>
-                            <div class="p-4 pt-0 border-t border-slate-600/50 mt-2">
-                                <img src="rcp-bebes.jpg" alt="Guía RCP Bebés" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'rcp-bebes.jpg' no encontrada.</p>
+                            <div class="p-4 pt-0 border-t" style="border-color: var(--border-color);">
+                                <img src="rcp-bebes.jpg" alt="Guía RCP Bebés" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="hidden items-center gap-2 py-8 justify-center" style="color: var(--text-muted);">
+                                    <i data-lucide="image-off" class="w-5 h-5"></i>
+                                    <span class="text-sm">Imagen 'rcp-bebes.jpg' no encontrada</span>
+                                </div>
                             </div>
                         </details>
                     </div>
                 </div>
 
-                <!-- 4. ATRAGANTAMIENTO -->
+                <!-- Atragantamiento -->
                 <div class="mb-8">
-                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">4. Atragantamiento / Asfixia</h3>
+                    <h3 class="font-bold uppercase text-sm mb-4 tracking-widest" style="color: var(--accent-red);">4. Atragantamiento / Asfixia</h3>
                     <div class="space-y-3">
-                        <details class="bg-slate-700/40 rounded-xl group border border-slate-600">
-                            <summary class="font-bold flex items-center justify-between p-4 cursor-pointer select-none">
-                                <div class="flex items-center gap-2"><i data-lucide="user-x" class="w-5 h-5 text-orange-400"></i> Adultos y Niños (Heimlich)</div>
-                                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
+                        <details class="rounded-xl group border overflow-hidden" style="background: var(--bg-item); border-color: var(--border-color);">
+                            <summary class="font-semibold flex items-center justify-between p-4 cursor-pointer select-none">
+                                <div class="flex items-center gap-2" style="color: var(--text-secondary);">
+                                    <i data-lucide="user-x" class="w-5 h-5" style="color: var(--accent-orange);"></i> Adultos y Niños (Heimlich)
+                                </div>
+                                <i data-lucide="chevron-down" class="chevron w-5 h-5" style="color: var(--text-muted);"></i>
                             </summary>
-                            <div class="p-4 pt-0 border-t border-slate-600/50 mt-2">
-                                <img src="atragantamiento-adultos-ninos.jpg" alt="Guía Atragantamiento Adultos y Niños" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'atragantamiento-adultos-ninos.jpg' no encontrada.</p>
+                            <div class="p-4 pt-0 border-t" style="border-color: var(--border-color);">
+                                <img src="atragantamiento-adultos-ninos.jpg" alt="Guía Atragantamiento Adultos y Niños" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="hidden items-center gap-2 py-8 justify-center" style="color: var(--text-muted);">
+                                    <i data-lucide="image-off" class="w-5 h-5"></i>
+                                    <span class="text-sm">Imagen 'atragantamiento-adultos-ninos.jpg' no encontrada</span>
+                                </div>
                             </div>
                         </details>
-
-                        <details class="bg-slate-700/40 rounded-xl group border border-slate-600">
-                            <summary class="font-bold flex items-center justify-between p-4 cursor-pointer select-none">
-                                <div class="flex items-center gap-2"><i data-lucide="baby" class="w-5 h-5 text-yellow-400"></i> Bebés (&lt; 1 año)</div>
-                                <i data-lucide="chevron-down" class="w-5 h-5 text-slate-400"></i>
+                        <details class="rounded-xl group border overflow-hidden" style="background: var(--bg-item); border-color: var(--border-color);">
+                            <summary class="font-semibold flex items-center justify-between p-4 cursor-pointer select-none">
+                                <div class="flex items-center gap-2" style="color: var(--text-secondary);">
+                                    <i data-lucide="baby" class="w-5 h-5" style="color: var(--accent-yellow);"></i> Bebés (&lt; 1 año)
+                                </div>
+                                <i data-lucide="chevron-down" class="chevron w-5 h-5" style="color: var(--text-muted);"></i>
                             </summary>
-                            <div class="p-4 pt-0 border-t border-slate-600/50 mt-2">
-                                <img src="atragantamiento-bebes.jpg" alt="Guía Atragantamiento Bebés" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'atragantamiento-bebes.jpg' no encontrada.</p>
+                            <div class="p-4 pt-0 border-t" style="border-color: var(--border-color);">
+                                <img src="atragantamiento-bebes.jpg" alt="Guía Atragantamiento Bebés" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="hidden items-center gap-2 py-8 justify-center" style="color: var(--text-muted);">
+                                    <i data-lucide="image-off" class="w-5 h-5"></i>
+                                    <span class="text-sm">Imagen 'atragantamiento-bebes.jpg' no encontrada</span>
+                                </div>
                             </div>
                         </details>
                     </div>
                 </div>
 
-                <!-- 5. HEMORRAGIAS -->
+                <!-- Hemorragias -->
                 <div>
-                    <h3 class="text-red-500 font-bold uppercase text-sm mb-4 tracking-widest">5. Hemorragias Severas</h3>
+                    <h3 class="font-bold uppercase text-sm mb-4 tracking-widest" style="color: var(--accent-red);">5. Hemorragias Severas</h3>
                     
-                    <details class="bg-slate-700/40 rounded-xl group border border-slate-600 mb-4">
-                        <summary class="font-bold flex items-center justify-between p-3 cursor-pointer select-none text-sm">
-                            <div class="flex items-center gap-2"><i data-lucide="image" class="w-4 h-4 text-blue-400"></i> Ver Infografía de Hemorragias</div>
-                            <i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i>
+                    <details class="rounded-xl group border mb-4 overflow-hidden" style="background: var(--bg-item); border-color: var(--border-color);">
+                        <summary class="font-semibold flex items-center justify-between p-3.5 cursor-pointer select-none text-sm" style="color: var(--text-secondary);">
+                            <div class="flex items-center gap-2">
+                                <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--accent-blue); opacity: 0.15;">
+                                    <i data-lucide="image" class="w-4 h-4" style="color: var(--accent-blue);"></i>
+                                </div>
+                                Ver Infografía de Hemorragias
+                            </div>
+                            <i data-lucide="chevron-down" class="chevron w-4 h-4" style="color: var(--text-muted);"></i>
                         </summary>
-                        <div class="p-3 pt-0 border-t border-slate-600/50 mt-2">
-                            <img src="hemorragia.jpg" alt="Guía de Hemorragias Severas" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                            <p class="text-xs text-red-400 hidden mt-2">Error: Imagen 'hemorragia.jpg' no encontrada.</p>
+                        <div class="p-3 pt-0 border-t" style="border-color: var(--border-color);">
+                            <img src="hemorragia.jpg" alt="Guía de Hemorragias Severas" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="hidden items-center gap-2 py-8 justify-center" style="color: var(--text-muted);">
+                                <i data-lucide="image-off" class="w-5 h-5"></i>
+                                <span class="text-sm">Imagen 'hemorragia.jpg' no encontrada</span>
+                            </div>
                         </div>
                     </details>
 
-                    <div class="bg-slate-700/30 border border-slate-600 p-5 rounded-xl space-y-5">
+                    <div class="p-5 rounded-xl border space-y-5" style="background: var(--bg-item); border-color: var(--border-color);">
                         <div class="flex gap-4">
-                            <div class="bg-red-500/20 p-2.5 rounded-xl h-fit border border-red-500/30">
-                                <i data-lucide="hand-metal" class="text-red-400 w-6 h-6"></i>
+                            <div class="p-2.5 rounded-xl h-fit border" style="background: var(--accent-red-glow); border-color: var(--accent-red);">
+                                <i data-lucide="hand-metal" class="w-6 h-6" style="color: var(--accent-red);"></i>
                             </div>
                             <div>
-                                <strong class="block text-white text-base mb-1">Presión Directa</strong>
-                                <p class="text-sm text-slate-300">Presione fuertemente sobre la herida con gasas limpias, toallas o ropa. Use ambas manos y el peso de su cuerpo si es necesario.</p>
-                                <p class="text-sm text-red-300 font-bold mt-1">Si la gasa se empapa de sangre, NO la quite. Coloque más material encima y siga presionando.</p>
+                                <strong class="block text-base mb-1" style="color: var(--text-primary);">Presión Directa</strong>
+                                <p class="text-sm" style="color: var(--text-secondary);">Presione fuertemente sobre la herida con gasas limpias, toallas o ropa. Use ambas manos y el peso de su cuerpo si es necesario.</p>
+                                <p class="text-sm font-bold mt-1" style="color: var(--accent-red);">Si la gasa se empapa, NO la quite. Coloque más material encima.</p>
                             </div>
                         </div>
-                        <div class="w-full h-px bg-slate-600/50"></div>
+                        <div class="w-full h-px" style="background: var(--border-color);"></div>
                         <div class="flex gap-4">
-                            <div class="bg-orange-500/20 p-2.5 rounded-xl h-fit border border-orange-500/30">
-                                <i data-lucide="scissors" class="text-orange-400 w-6 h-6"></i>
+                            <div class="p-2.5 rounded-xl h-fit border" style="background: rgba(234,88,12,0.15); border-color: var(--accent-orange);">
+                                <i data-lucide="scissors" class="w-6 h-6" style="color: var(--accent-orange);"></i>
                             </div>
                             <div>
-                                <strong class="block text-white text-base mb-1">Torniquete (Último Recurso)</strong>
-                                <p class="text-sm text-slate-300">Utilizar SOLAMENTE en brazos o piernas cuando hay amputación o la presión directa no detiene el sangrado masivo vital.</p>
-                                <ul class="text-xs text-slate-400 mt-2 space-y-1">
-                                    <li>• Colocar de 5 a 8 cm por encima de la herida (nunca sobre una articulación).</li>
-                                    <li>• Apretar el molinete hasta que el sangrado cese por completo.</li>
-                                    <li>• <strong class="text-orange-300">Anotar la HORA EXACTA de colocación.</strong></li>
-                                    <li>• <strong class="text-red-400 uppercase">NUNCA aflojar el torniquete</strong> una vez puesto.</li>
+                                <strong class="block text-base mb-1" style="color: var(--text-primary);">Torniquete (Último Recurso)</strong>
+                                <p class="text-sm" style="color: var(--text-secondary);">Utilizar SOLAMENTE en brazos o piernas cuando hay amputación o la presión directa no detiene el sangrado.</p>
+                                <ul class="text-xs mt-2 space-y-1" style="color: var(--text-muted);">
+                                    <li>• Colocar de 5 a 8 cm por encima de la herida (nunca sobre articulación).</li>
+                                    <li>• Apretar hasta que el sangrado cese por completo.</li>
+                                    <li>• <strong style="color: var(--accent-orange);">Anotar la HORA EXACTA de colocación.</strong></li>
+                                    <li>• <strong style="color: var(--accent-red);">NUNCA aflojar el torniquete</strong> una vez puesto.</li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </section>
 
+        <!-- SECTION: MAPA -->
+        <section id="map-section" class="tab-content space-y-6">
+            <div class="glass-strong p-6 rounded-2xl">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: var(--accent-red-glow);">
+                        <i data-lucide="map" style="color: var(--accent-red);" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold" style="color: var(--text-primary);">Mapa Local</h2>
+                        <p class="text-xs" style="color: var(--text-muted);">Descarga tu zona para uso offline</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2 mb-4">
+                    <button onclick="locateUser()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all hover:opacity-90 active:scale-95" style="background: var(--accent-blue);">
+                        <i data-lucide="crosshair" class="w-4 h-4"></i> Localizarme
+                    </button>
+                    <button id="btn-download-map" onclick="downloadMap()" disabled class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all opacity-50 cursor-not-allowed active:scale-95" style="background: var(--accent-green);">
+                        <i data-lucide="download" class="w-4 h-4"></i> Descargar Mapa
+                    </button>
+                    <button id="btn-gmaps" onclick="openInGoogleMaps()" disabled class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all opacity-50 cursor-not-allowed active:scale-95 border" style="background: var(--bg-item); color: var(--text-primary); border-color: var(--border-color);">
+                        <i data-lucide="external-link" class="w-4 h-4"></i> Abrir en Google Maps
+                    </button>
+                </div>
+
+                <div id="map-loader" class="hidden mb-3 flex items-center gap-2" style="color: var(--accent-blue);">
+                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+                    <span class="text-sm">Cargando mapa...</span>
+                </div>
+                <p id="map-status" class="text-sm mb-3 font-medium" style="color: var(--text-muted);">Pulsa "Localizarme" para obtener tu posición.</p>
+
+                <div class="rounded-2xl overflow-hidden border shadow-lg" style="border-color: var(--border-color);">
+                    <div id="leaflet-map"></div>
+                </div>
+
+                <div class="mt-4 p-4 rounded-xl border flex items-start gap-3" style="background: var(--bg-item); border-color: var(--border-color);">
+                    <i data-lucide="info" class="w-5 h-5 flex-shrink-0 mt-0.5" style="color: var(--accent-blue);"></i>
+                    <p class="text-xs leading-relaxed" style="color: var(--text-secondary);">
+                        <strong style="color: var(--text-primary);">Consejo:</strong> Haz zoom a tu zona exacta antes de descargar. La imagen se guardará en tu galería. Para uso offline real, considera descargar mapas desde la app oficial de Google Maps.
+                    </p>
+                </div>
             </div>
         </section>
 
         <!-- SECTION: S.O.S GENERATOR -->
         <section id="sos-section" class="tab-content space-y-4">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 text-center">
-                <h2 class="text-2xl font-bold flex items-center justify-center gap-2 mb-2 text-red-500">
-                    <i data-lucide="triangle-alert"></i> Baliza S.O.S
-                </h2>
-                <p class="text-xs text-slate-400 mb-6 px-4">
-                    ADVERTENCIA: El uso continuado drenará rápidamente la batería. Use el destello visual preferiblemente de noche. El código es (... --- ...).
+            <div class="glass-strong p-6 rounded-2xl text-center">
+                <div class="flex items-center justify-center gap-3 mb-2">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: var(--accent-red-glow);">
+                        <i data-lucide="triangle-alert" style="color: var(--accent-red);" class="w-6 h-6"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold" style="color: var(--accent-red);">Baliza S.O.S</h2>
+                </div>
+                <p class="text-xs mb-6 px-4" style="color: var(--text-muted);">
+                    ADVERTENCIA: El uso continuado drenará rápidamente la batería. Use el destello visual preferiblemente de noche.
                 </p>
 
-                <div class="flex justify-center gap-6 mb-8">
+                <div class="flex justify-center items-center gap-8 mb-6">
                     <label class="flex flex-col items-center gap-2 cursor-pointer">
-                        <span class="text-sm font-semibold uppercase">Luz</span>
-                        <input type="checkbox" id="sos-light-toggle" class="w-6 h-6 accent-red-500" checked>
+                        <span class="text-sm font-semibold uppercase" style="color: var(--text-secondary);">Luz</span>
+                        <input type="checkbox" id="sos-light-toggle" class="switch-toggle" checked>
                     </label>
                     <label class="flex flex-col items-center gap-2 cursor-pointer">
-                        <span class="text-sm font-semibold uppercase">Sonido</span>
-                        <input type="checkbox" id="sos-sound-toggle" class="w-6 h-6 accent-red-500" checked>
+                        <span class="text-sm font-semibold uppercase" style="color: var(--text-secondary);">Sonido</span>
+                        <input type="checkbox" id="sos-sound-toggle" class="switch-toggle" checked>
                     </label>
                 </div>
 
-                <button id="btn-toggle-sos" onclick="toggleSOS()" class="bg-red-600 hover:bg-red-500 text-white font-bold py-6 px-12 rounded-full text-2xl uppercase tracking-widest shadow-[0_0_20px_rgba(220,38,38,0.5)] transition-all transform active:scale-95 w-full max-w-xs mx-auto">
-                    Iniciar S.O.S
-                </button>
+                <div class="flex justify-center gap-1.5 mb-6">
+                    <div class="morse-indicator"></div>
+                    <div class="morse-indicator"></div>
+                    <div class="morse-indicator"></div>
+                    <div class="w-2"></div>
+                    <div class="morse-indicator"></div>
+                    <div class="morse-indicator"></div>
+                    <div class="morse-indicator"></div>
+                    <div class="w-2"></div>
+                    <div class="morse-indicator"></div>
+                    <div class="morse-indicator"></div>
+                    <div class="morse-indicator"></div>
+                </div>
+
+                <div class="relative inline-block">
+                    <div id="sos-ripples" class="absolute inset-0 flex items-center justify-center pointer-events-none"></div>
+                    <button id="btn-toggle-sos" onclick="toggleSOS()" class="relative z-10 font-bold py-6 px-12 rounded-full text-2xl uppercase tracking-widest transition-all transform active:scale-95 w-full max-w-xs mx-auto text-white" style="background: var(--accent-red); box-shadow: 0 0 30px var(--accent-red-glow);">
+                        Iniciar S.O.S
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION: NOTAS RÁPIDAS -->
+        <section id="notes-section" class="tab-content space-y-6">
+            <div class="glass-strong p-6 rounded-2xl">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: var(--accent-red-glow);">
+                        <i data-lucide="notebook-pen" style="color: var(--accent-red);" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-2xl font-bold" style="color: var(--text-primary);">Notas Rápidas</h2>
+                        <p class="text-xs" style="color: var(--text-muted);">Anotaciones de emergencia guardadas localmente</p>
+                    </div>
+                </div>
+
+                <!-- Formulario nueva nota -->
+                <div class="p-4 rounded-xl border mb-6" style="background: var(--bg-item); border-color: var(--border-color);">
+                    <div class="mb-3">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color: var(--text-muted);">Título</label>
+                        <input type="text" id="note-title" placeholder="Ej: Punto de reunión, contactos..." class="note-input w-full px-3.5 py-2.5 rounded-xl text-sm">
+                    </div>
+                    <div class="mb-3">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1.5" style="color: var(--text-muted);">Contenido</label>
+                        <textarea id="note-content" rows="3" placeholder="Escribe aquí la información importante..." class="note-input w-full px-3.5 py-2.5 rounded-xl text-sm"></textarea>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-semibold uppercase" style="color: var(--text-muted);">Prioridad:</span>
+                            <button type="button" onclick="setNotePriority('high')" id="prio-high" class="priority-btn priority-btn-high" title="Alta"></button>
+                            <button type="button" onclick="setNotePriority('medium')" id="prio-medium" class="priority-btn priority-btn-medium selected" title="Media"></button>
+                            <button type="button" onclick="setNotePriority('low')" id="prio-low" class="priority-btn priority-btn-low" title="Baja"></button>
+                        </div>
+                        <button onclick="addNote()" class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-semibold text-sm transition-all hover:opacity-90 active:scale-95" style="background: var(--accent-red);">
+                            <i data-lucide="plus" class="w-4 h-4"></i> Añadir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
+                    <button onclick="filterNotes('all')" id="filter-all" class="filter-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-all" style="background: var(--accent-red); color: white;">Todas</button>
+                    <button onclick="filterNotes('high')" id="filter-high" class="filter-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-all" style="background: var(--bg-item); color: var(--text-secondary); border: 1px solid var(--border-color);">Alta</button>
+                    <button onclick="filterNotes('medium')" id="filter-medium" class="filter-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-all" style="background: var(--bg-item); color: var(--text-secondary); border: 1px solid var(--border-color);">Media</button>
+                    <button onclick="filterNotes('low')" id="filter-low" class="filter-btn px-3 py-1.5 rounded-full text-xs font-semibold transition-all" style="background: var(--bg-item); color: var(--text-secondary); border: 1px solid var(--border-color);">Baja</button>
+                </div>
+
+                <!-- Lista de notas -->
+                <div id="notes-list" class="space-y-3 stagger-in">
+                    <!-- Se genera dinámicamente -->
+                </div>
+
+                <div id="notes-empty" class="hidden text-center py-10">
+                    <div class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center" style="background: var(--bg-item);">
+                        <i data-lucide="notebook-pen" class="w-8 h-8" style="color: var(--text-muted);"></i>
+                    </div>
+                    <p class="text-sm font-medium" style="color: var(--text-muted);">No hay notas guardadas</p>
+                    <p class="text-xs mt-1" style="color: var(--text-muted);">Añade una nota para empezar</p>
+                </div>
             </div>
         </section>
 
     </main>
 
-    <!-- Navigation Bar ajustada a 4 items -->
-    <nav class="fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-700 flex justify-between px-4 py-2 z-50">
-        <button onclick="showTab('backpack')" class="nav-btn flex flex-col items-center p-2 text-red-500 flex-1" data-tab="backpack">
-            <i data-lucide="package" class="w-6 h-6"></i>
-            <span class="text-[10px] mt-1 font-semibold">Mochila</span>
+    <!-- Navigation Bar -->
+    <nav class="fixed bottom-0 left-0 right-0 z-50 flex justify-between px-2 py-1" style="background: var(--bg-nav); backdrop-filter: blur(16px); border-top: 1px solid var(--border-color);">
+        <div id="nav-indicator" class="nav-indicator"></div>
+        <button onclick="showTab('backpack')" class="nav-btn flex flex-col items-center p-2 flex-1 relative" data-tab="backpack" style="color: var(--accent-red);">
+            <i data-lucide="package" class="w-5 h-5"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">Mochila</span>
         </button>
-        <button onclick="showTab('radio')" class="nav-btn flex flex-col items-center p-2 text-slate-500 flex-1" data-tab="radio">
-            <i data-lucide="radio" class="w-6 h-6"></i>
-            <span class="text-[10px] mt-1 font-semibold">Plan 333</span>
+        <button onclick="showTab('radio')" class="nav-btn flex flex-col items-center p-2 flex-1 relative" data-tab="radio" style="color: var(--text-muted);">
+            <i data-lucide="radio" class="w-5 h-5"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">Plan 333</span>
         </button>
-        <button onclick="showTab('aid')" class="nav-btn flex flex-col items-center p-2 text-slate-500 flex-1" data-tab="aid">
-            <i data-lucide="plus-circle" class="w-6 h-6"></i>
-            <span class="text-[10px] mt-1 font-semibold">Auxilio</span>
+        <button onclick="showTab('aid')" class="nav-btn flex flex-col items-center p-2 flex-1 relative" data-tab="aid" style="color: var(--text-muted);">
+            <i data-lucide="plus-circle" class="w-5 h-5"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">Auxilio</span>
         </button>
-        <button onclick="showTab('sos-section')" class="nav-btn flex flex-col items-center p-2 text-slate-500 flex-1" data-tab="sos-section">
-            <i data-lucide="triangle-alert" class="w-6 h-6"></i>
-            <span class="text-[10px] mt-1 font-semibold">S.O.S</span>
+        <button onclick="showTab('map-section')" class="nav-btn flex flex-col items-center p-2 flex-1 relative" data-tab="map-section" style="color: var(--text-muted);">
+            <i data-lucide="map" class="w-5 h-5"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">Mapa</span>
+        </button>
+        <button onclick="showTab('sos-section')" class="nav-btn flex flex-col items-center p-2 flex-1 relative" data-tab="sos-section" style="color: var(--text-muted);">
+            <i data-lucide="triangle-alert" class="w-5 h-5"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">S.O.S</span>
+        </button>
+        <button onclick="showTab('notes-section')" class="nav-btn flex flex-col items-center p-2 flex-1 relative" data-tab="notes-section" style="color: var(--text-muted);">
+            <i data-lucide="notebook-pen" class="w-5 h-5"></i>
+            <span class="text-[10px] mt-0.5 font-semibold">Notas</span>
         </button>
     </nav>
 
@@ -424,102 +898,140 @@
             { cat: "Documentos y Efectivo", items: ["Copia DNI/Pasaporte", "Dinero en efectivo (billetes pequeños)", "Libreta y bolígrafo", "Copia llaves"] }
         ];
 
-        // --- INITIALIZATION ---
+        // --- THEME ---
+        function initTheme() {
+            const saved = localStorage.getItem('portal_theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (saved === 'dark' || (!saved && prefersDark)) {
+                document.documentElement.classList.add('dark');
+                updateThemeIcon(true);
+            } else {
+                document.documentElement.classList.remove('dark');
+                updateThemeIcon(false);
+            }
+        }
+        function toggleTheme() {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('portal_theme', isDark ? 'dark' : 'light');
+            updateThemeIcon(isDark);
+            const meta = document.querySelector('meta[name="theme-color"]');
+            meta.content = isDark ? '#0f172a' : '#dc2626';
+        }
+        function updateThemeIcon(isDark) {
+            document.getElementById('theme-icon-sun').classList.toggle('hidden', isDark);
+            document.getElementById('theme-icon-moon').classList.toggle('hidden', !isDark);
+        }
+
+        // --- INIT ---
         window.onload = function() {
+            initTheme();
             lucide.createIcons();
             checkDisclaimer();
             initBackpack();
             startRadioTimer();
             checkNetworkStatus();
             setupPWAInstall();
+            initNotes();
+            setTimeout(() => updateNavIndicator('backpack'), 100);
         };
 
-        // --- PWA INSTALLATION LOGIC ---
+        // --- PWA ---
         let deferredPrompt;
-        
         function setupPWAInstall() {
             const installBtn = document.getElementById('btn-install');
-            
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
                 installBtn.classList.remove('hidden');
                 installBtn.classList.add('flex');
             });
-
             installBtn.addEventListener('click', async () => {
                 if (deferredPrompt !== null) {
                     deferredPrompt.prompt();
                     const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        console.log('App instalada por el usuario');
-                    }
                     deferredPrompt = null;
                     installBtn.classList.add('hidden');
                     installBtn.classList.remove('flex');
                 }
             });
-
             window.addEventListener('appinstalled', () => {
                 installBtn.classList.add('hidden');
                 installBtn.classList.remove('flex');
                 deferredPrompt = null;
-                console.log('PWA ha sido instalada en el sistema.');
             });
         }
 
-        // --- DISCLAIMER LOGIC ---
+        // --- DISCLAIMER ---
         function checkDisclaimer() {
-            const isAccepted = localStorage.getItem('portal_disclaimer_accepted');
-            if (!isAccepted) {
-                document.getElementById('disclaimer-modal').classList.remove('hidden');
-                document.getElementById('disclaimer-modal').classList.add('flex');
+            if (!localStorage.getItem('portal_disclaimer_accepted')) {
+                const modal = document.getElementById('disclaimer-modal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
             }
         }
-
         function acceptDisclaimer() {
             localStorage.setItem('portal_disclaimer_accepted', 'true');
-            document.getElementById('disclaimer-modal').classList.add('hidden');
-            document.getElementById('disclaimer-modal').classList.remove('flex');
+            const modal = document.getElementById('disclaimer-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
 
         // --- NETWORK STATUS ---
         function checkNetworkStatus() {
             const statusEl = document.getElementById('connection-status');
-            const updateStatus = () => {
+            const update = () => {
                 if (navigator.onLine) {
-                    statusEl.textContent = 'Online';
-                    statusEl.className = 'bg-green-500 text-[10px] px-2 py-1.5 rounded-full text-white font-bold uppercase';
+                    statusEl.innerHTML = '<span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span> Online';
+                    statusEl.style.background = 'var(--accent-green)';
                 } else {
-                    statusEl.textContent = 'Modo Offline';
-                    statusEl.className = 'bg-red-500 text-[10px] px-2 py-1.5 rounded-full text-white font-bold uppercase';
+                    statusEl.innerHTML = '<span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span> Offline';
+                    statusEl.style.background = 'var(--accent-red)';
                 }
             };
-            window.addEventListener('online', updateStatus);
-            window.addEventListener('offline', updateStatus);
-            updateStatus();
+            window.addEventListener('online', update);
+            window.addEventListener('offline', update);
+            update();
         }
 
         // --- NAVIGATION ---
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-red-500');
-                btn.classList.add('text-slate-500');
+                btn.style.color = 'var(--text-muted)';
             });
-            document.querySelector(`[data-tab="${tabId}"]`).classList.add('text-red-500');
+            const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
+            if (activeBtn) activeBtn.style.color = 'var(--accent-red)';
+            
+            updateNavIndicator(tabId);
         }
 
-        // --- MOCHILA LOGIC ---
+        function updateNavIndicator(tabId) {
+            const btn = document.querySelector(`[data-tab="${tabId}"]`);
+            const indicator = document.getElementById('nav-indicator');
+            if (btn && indicator) {
+                const nav = btn.parentElement;
+                const btnRect = btn.getBoundingClientRect();
+                const navRect = nav.getBoundingClientRect();
+                indicator.style.width = btnRect.width + 'px';
+                indicator.style.left = (btnRect.left - navRect.left) + 'px';
+            }
+        }
+        window.addEventListener('resize', () => {
+            const active = document.querySelector('.tab-content.active');
+            if (active) updateNavIndicator(active.id);
+        });
+
+        // --- MOCHILA ---
         function initBackpack() {
             const container = document.getElementById('checklist-container');
             const savedState = JSON.parse(localStorage.getItem('portal_backpack') || '{}');
 
             backpackData.forEach((section, sIdx) => {
                 const sectionDiv = document.createElement('div');
-                sectionDiv.innerHTML = `<h3 class="font-bold text-slate-400 text-sm mb-2 uppercase">${section.cat}</h3>`;
+                sectionDiv.innerHTML = `<h3 class="font-semibold text-xs mb-2 uppercase tracking-wider" style="color: var(--text-muted);">${section.cat}</h3>`;
                 const list = document.createElement('div');
                 list.className = "space-y-2";
 
@@ -527,9 +1039,9 @@
                     const id = `item-${sIdx}-${iIdx}`;
                     const isChecked = savedState[id] ? 'checked' : '';
                     list.innerHTML += `
-                        <label class="flex items-center gap-3 bg-slate-700/30 p-3 rounded-lg cursor-pointer hover:bg-slate-700 transition">
-                            <input type="checkbox" id="${id}" ${isChecked} onchange="saveBackpack()" class="w-5 h-5 accent-red-500 rounded">
-                            <span class="text-sm">${item}</span>
+                        <label class="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all hover:translate-x-1" style="background: var(--bg-item); border: 1px solid var(--border-color);">
+                            <input type="checkbox" id="${id}" ${isChecked} onchange="saveBackpack()" class="check-custom">
+                            <span class="text-sm" style="color: var(--text-secondary);">${item}</span>
                         </label>
                     `;
                 });
@@ -550,19 +1062,18 @@
         function updateProgress() {
             const checkboxes = document.querySelectorAll('#checklist-container input[type="checkbox"]');
             const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
-            const percent = (checked / checkboxes.length) * 100;
-            document.getElementById('backpack-progress').style.width = `${percent}%`;
+            const percent = Math.round((checked / checkboxes.length) * 100);
+            document.getElementById('backpack-progress').style.width = percent + '%';
+            document.getElementById('backpack-percent').textContent = percent + '%';
         }
 
-        // --- RADIO 333 LOGIC ---
+        // --- RADIO 333 ---
         function startRadioTimer() {
             function update() {
                 const now = new Date();
                 const nextWindow = new Date();
-                
                 const hours = now.getHours();
                 const nextHour = Math.ceil((hours + 0.01) / 3) * 3;
-                
                 nextWindow.setHours(nextHour % 24, 0, 0, 0);
                 if (nextHour >= 24) nextWindow.setDate(now.getDate() + 1);
 
@@ -572,26 +1083,126 @@
                 const s = Math.floor((diff % 60000) / 1000);
 
                 document.getElementById('radio-timer').innerText = 
-                    `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+                    `${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
                 
                 const isWindow = (hours % 3 === 0 && now.getMinutes() < 3);
                 const statusEl = document.getElementById('radio-status');
                 if (isWindow) {
                     statusEl.innerText = "¡TRANSMITIENDO! (Batería ON)";
-                    statusEl.className = "text-sm font-bold text-green-500 uppercase px-3 py-1 bg-green-500/20 rounded-full animate-pulse";
+                    statusEl.style.color = 'var(--accent-green)';
+                    statusEl.style.background = 'rgba(34,197,94,0.15)';
                 } else {
                     statusEl.innerText = "ESCUCHA (Batería OFF)";
-                    statusEl.className = "text-sm font-bold text-yellow-500 uppercase px-3 py-1 bg-yellow-500/20 rounded-full";
+                    statusEl.style.color = 'var(--accent-yellow)';
+                    statusEl.style.background = 'rgba(217,119,6,0.15)';
                 }
             }
             setInterval(update, 1000);
             update();
         }
 
-        // --- S.O.S GENERATOR LOGIC ---
+        // --- MAP LOGIC ---
+        let map = null;
+        let mapMarker = null;
+        let userLat = null;
+        let userLng = null;
+
+        function locateUser() {
+            const statusEl = document.getElementById('map-status');
+            const loader = document.getElementById('map-loader');
+            
+            if (!navigator.geolocation) {
+                statusEl.textContent = "La geolocalización no está soportada en este dispositivo.";
+                statusEl.style.color = 'var(--accent-red)';
+                return;
+            }
+
+            statusEl.textContent = "Obteniendo ubicación...";
+            statusEl.style.color = 'var(--accent-blue)';
+            loader.classList.remove('hidden');
+
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    userLat = pos.coords.latitude;
+                    userLng = pos.coords.longitude;
+                    initMap(userLat, userLng);
+                    statusEl.textContent = `Ubicación: ${userLat.toFixed(4)}, ${userLng.toFixed(4)}`;
+                    statusEl.style.color = 'var(--accent-green)';
+                    loader.classList.add('hidden');
+                    
+                    document.getElementById('btn-download-map').disabled = false;
+                    document.getElementById('btn-download-map').classList.remove('opacity-50', 'cursor-not-allowed');
+                    document.getElementById('btn-gmaps').disabled = false;
+                    document.getElementById('btn-gmaps').classList.remove('opacity-50', 'cursor-not-allowed');
+                },
+                (err) => {
+                    loader.classList.add('hidden');
+                    statusEl.textContent = "Error al obtener ubicación. Asegúrate de permitir el acceso.";
+                    statusEl.style.color = 'var(--accent-red)';
+                    initMap(40.4168, -3.7038);
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+            );
+        }
+
+        function initMap(lat, lng) {
+            if (map) {
+                map.setView([lat, lng], 16);
+                if (mapMarker) mapMarker.setLatLng([lat, lng]);
+                else mapMarker = L.marker([lat, lng]).addTo(map);
+                return;
+            }
+
+            map = L.map('leaflet-map', { zoomControl: false }).setView([lat, lng], 16);
+            L.control.zoom({ position: 'bottomright' }).addTo(map);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors',
+                maxZoom: 19
+            }).addTo(map);
+
+            mapMarker = L.marker([lat, lng]).addTo(map)
+                .bindPopup("<b>Tu ubicación</b>").openPopup();
+        }
+
+        function downloadMap() {
+            if (!map) return;
+            const statusEl = document.getElementById('map-status');
+            statusEl.textContent = "Generando imagen, espera...";
+            statusEl.style.color = 'var(--accent-blue)';
+
+            const mapEl = document.getElementById('leaflet-map');
+            
+            html2canvas(mapEl, {
+                useCORS: true,
+                allowTaint: true,
+                backgroundColor: null,
+                scale: 2
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `mapa-emergencia-${new Date().toISOString().slice(0,10)}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                statusEl.textContent = "¡Mapa descargado correctamente!";
+                statusEl.style.color = 'var(--accent-green)';
+            }).catch(err => {
+                console.error(err);
+                statusEl.textContent = "No se pudo generar la imagen. Intenta hacer una captura de pantalla manual.";
+                statusEl.style.color = 'var(--accent-red)';
+            });
+        }
+
+        function openInGoogleMaps() {
+            if (userLat && userLng) {
+                window.open(`https://www.google.com/maps?q=${userLat},${userLng}`, '_blank');
+            }
+        }
+
+        // --- S.O.S GENERATOR ---
         let sosActive = false;
         let audioContext = null;
         let oscillator = null;
+        let gainNode = null;
         
         const UNIT = 200; 
         const DOT = UNIT;
@@ -614,21 +1225,63 @@
 
             if (sosActive) {
                 btn.innerText = "DETENER S.O.S";
-                btn.classList.replace('bg-red-600', 'bg-slate-700');
-                btn.classList.replace('hover:bg-red-500', 'hover:bg-slate-600');
+                btn.style.background = 'var(--bg-item)';
+                btn.style.color = 'var(--text-primary)';
+                btn.style.border = '2px solid var(--accent-red)';
                 
                 if (document.getElementById('sos-sound-toggle').checked) {
                     if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
                     if (audioContext.state === 'suspended') await audioContext.resume();
                 }
                 
+                startRipples();
                 runSOSLoop();
             } else {
                 btn.innerText = "INICIAR S.O.S";
-                btn.classList.replace('bg-slate-700', 'bg-red-600');
-                btn.classList.replace('hover:bg-slate-600', 'hover:bg-red-500');
+                btn.style.background = 'var(--accent-red)';
+                btn.style.color = 'white';
+                btn.style.border = 'none';
+                stopRipples();
                 stopSignal();
+                resetMorseIndicators();
             }
+        }
+
+        function startRipples() {
+            const container = document.getElementById('sos-ripples');
+            container.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    if (!sosActive) return;
+                    const ripple = document.createElement('div');
+                    ripple.className = 'ripple';
+                    container.appendChild(ripple);
+                    setTimeout(() => ripple.remove(), 1500);
+                }, i * 500);
+            }
+            const interval = setInterval(() => {
+                if (!sosActive) { clearInterval(interval); return; }
+                const ripple = document.createElement('div');
+                ripple.className = 'ripple';
+                container.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 1500);
+            }, 1500);
+        }
+
+        function stopRipples() {
+            document.getElementById('sos-ripples').innerHTML = '';
+        }
+
+        function setMorseIndicator(index, active) {
+            const indicators = document.querySelectorAll('.morse-indicator');
+            if (indicators[index]) {
+                if (active) indicators[index].classList.add('active');
+                else indicators[index].classList.remove('active');
+            }
+        }
+
+        function resetMorseIndicators() {
+            document.querySelectorAll('.morse-indicator').forEach(el => el.classList.remove('active'));
         }
 
         async function runSOSLoop() {
@@ -637,6 +1290,7 @@
             const useSound = document.getElementById('sos-sound-toggle').checked;
 
             while (sosActive) {
+                let symbolIndex = 0;
                 for (let i = 0; i < sosPattern.length; i += 2) {
                     if (!sosActive) break;
                     
@@ -645,27 +1299,31 @@
 
                     if (useLight) overlay.style.display = 'block';
                     if (useSound && audioContext) startBeep();
+                    setMorseIndicator(symbolIndex, true);
                     
                     await sleep(onDuration);
 
                     if (useLight) overlay.style.display = 'none';
                     if (useSound) stopBeep();
+                    setMorseIndicator(symbolIndex, false);
+                    symbolIndex++;
 
                     await sleep(offDuration);
                 }
             }
             stopSignal();
+            resetMorseIndicators();
         }
 
         function startBeep() {
             if (!audioContext) return;
             oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
+            gainNode = audioContext.createGain();
             oscillator.type = 'sine';
-            oscillator.frequency.value = 800;
+            oscillator.frequency.value = 1000;
             
             gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(1, audioContext.currentTime + 0.01);
+            gainNode.gain.linearRampToValueAtTime(0.8, audioContext.currentTime + 0.02);
             
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
@@ -674,9 +1332,15 @@
 
         function stopBeep() {
             if (oscillator) {
-                oscillator.stop();
-                oscillator.disconnect();
+                try {
+                    const now = audioContext.currentTime;
+                    gainNode.gain.cancelScheduledValues(now);
+                    gainNode.gain.setValueAtTime(gainNode.gain.value, now);
+                    gainNode.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    oscillator.stop(now + 0.06);
+                } catch(e) {}
                 oscillator = null;
+                gainNode = null;
             }
         }
 
@@ -685,15 +1349,192 @@
             stopBeep();
         }
 
-        // --- PWA SERVICE WORKER REGISTRATION ---
-        if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.protocol === 'http:')) {
+        // --- NOTAS RÁPIDAS ---
+        let currentNotePriority = 'medium';
+        let currentFilter = 'all';
+
+        function setNotePriority(priority) {
+            currentNotePriority = priority;
+            document.querySelectorAll('.priority-btn').forEach(btn => btn.classList.remove('selected'));
+            document.getElementById(`prio-${priority}`).classList.add('selected');
+        }
+
+        function getNotes() {
+            return JSON.parse(localStorage.getItem('portal_notes') || '[]');
+        }
+
+        function saveNotes(notes) {
+            localStorage.setItem('portal_notes', JSON.stringify(notes));
+        }
+
+        function addNote() {
+            const titleInput = document.getElementById('note-title');
+            const contentInput = document.getElementById('note-content');
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim();
+
+            if (!title && !content) {
+                titleInput.focus();
+                return;
+            }
+
+            const notes = getNotes();
+            const note = {
+                id: Date.now().toString(),
+                title: title || 'Sin título',
+                content: content,
+                priority: currentNotePriority,
+                createdAt: new Date().toISOString()
+            };
+
+            notes.unshift(note);
+            saveNotes(notes);
+
+            titleInput.value = '';
+            contentInput.value = '';
+            setNotePriority('medium');
+
+            renderNotes();
+        }
+
+        function deleteNote(id) {
+            const card = document.getElementById(`note-${id}`);
+            if (card) {
+                card.classList.add('removing');
+                setTimeout(() => {
+                    const notes = getNotes().filter(n => n.id !== id);
+                    saveNotes(notes);
+                    renderNotes();
+                }, 250);
+            }
+        }
+
+        function editNote(id) {
+            const notes = getNotes();
+            const note = notes.find(n => n.id === id);
+            if (!note) return;
+
+            const newTitle = prompt('Editar título:', note.title);
+            if (newTitle === null) return;
+
+            const newContent = prompt('Editar contenido:', note.content);
+            if (newContent === null) return;
+
+            note.title = newTitle.trim() || 'Sin título';
+            note.content = newContent.trim();
+            note.updatedAt = new Date().toISOString();
+
+            saveNotes(notes);
+            renderNotes();
+        }
+
+        function filterNotes(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.style.background = 'var(--bg-item)';
+                btn.style.color = 'var(--text-secondary)';
+                btn.style.border = '1px solid var(--border-color)';
+            });
+            const activeBtn = document.getElementById(`filter-${filter}`);
+            if (activeBtn) {
+                activeBtn.style.background = 'var(--accent-red)';
+                activeBtn.style.color = 'white';
+                activeBtn.style.border = 'none';
+            }
+            renderNotes();
+        }
+
+        function formatDate(isoString) {
+            const d = new Date(isoString);
+            const now = new Date();
+            const diff = now - d;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);
+
+            if (minutes < 1) return 'Ahora mismo';
+            if (minutes < 60) return `Hace ${minutes} min`;
+            if (hours < 24) return `Hace ${hours} h`;
+            if (days < 7) return `Hace ${days} d`;
+            return d.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function getPriorityLabel(priority) {
+            const labels = { high: 'Alta', medium: 'Media', low: 'Baja' };
+            return labels[priority] || 'Media';
+        }
+
+        function getPriorityColor(priority) {
+            const colors = {
+                high: 'var(--accent-red)',
+                medium: 'var(--accent-yellow)',
+                low: 'var(--accent-green)'
+            };
+            return colors[priority] || 'var(--accent-yellow)';
+        }
+
+        function renderNotes() {
+            const container = document.getElementById('notes-list');
+            const emptyState = document.getElementById('notes-empty');
+            let notes = getNotes();
+
+            if (currentFilter !== 'all') {
+                notes = notes.filter(n => n.priority === currentFilter);
+            }
+
+            if (notes.length === 0) {
+                container.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            container.innerHTML = notes.map(note => `
+                <div id="note-${note.id}" class="note-card p-4 rounded-xl border note-priority-${note.priority}" style="background: var(--bg-item); border-color: var(--border-color);">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-1">
+                                <h4 class="font-bold text-sm truncate" style="color: var(--text-primary);">${escapeHtml(note.title)}</h4>
+                                <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-full" style="background: ${getPriorityColor(note.priority)}20; color: ${getPriorityColor(note.priority)};">
+                                    ${getPriorityLabel(note.priority)}
+                                </span>
+                            </div>
+                            <p class="text-sm whitespace-pre-wrap" style="color: var(--text-secondary);">${escapeHtml(note.content)}</p>
+                            <p class="text-[10px] mt-2 font-mono" style="color: var(--text-muted);">${formatDate(note.createdAt)}${note.updatedAt ? ' · Editado' : ''}</p>
+                        </div>
+                        <div class="flex flex-col gap-1 flex-shrink-0">
+                            <button onclick="editNote('${note.id}')" class="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-80" style="background: var(--bg-body);" title="Editar">
+                                <i data-lucide="pencil" class="w-3.5 h-3.5" style="color: var(--text-muted);"></i>
+                            </button>
+                            <button onclick="deleteNote('${note.id}')" class="w-8 h-8 rounded-lg flex items-center justify-center transition-all hover:opacity-80" style="background: var(--accent-red-glow);" title="Eliminar">
+                                <i data-lucide="trash-2" class="w-3.5 h-3.5" style="color: var(--accent-red);"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function initNotes() {
+            renderNotes();
+        }
+
+        // --- SERVICE WORKER ---
+        if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js')
-                    .then(registration => console.log('ServiceWorker registrado con éxito'))
-                    .catch(err => console.error('Error al registrar el ServiceWorker:', err));
+                    .then(() => console.log('SW registrado'))
+                    .catch(err => console.error('SW error:', err));
             });
-        } else {
-            console.log('Service Worker no registrado: Entorno no compatible.');
         }
     </script>
 </body>
