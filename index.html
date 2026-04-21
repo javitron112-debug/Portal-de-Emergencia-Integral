@@ -11,10 +11,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -214,9 +210,6 @@
         .theme-transition {
             transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
         }
-
-        #leaflet-map { height: 380px; width: 100%; border-radius: 16px; z-index: 1; }
-        .leaflet-container { background: var(--bg-item) !important; }
 
         .stagger-in > * {
             animation: staggerFade 0.4s ease-out backwards;
@@ -708,61 +701,22 @@
 
         <!-- SECTION: MAPA -->
         <section id="map-section" class="tab-content space-y-6">
-            <div class="glass-strong p-6 rounded-2xl">
-                <div class="flex items-center gap-3 mb-5">
+            <div class="glass-strong p-4 rounded-2xl">
+                <div class="flex items-center gap-3 mb-4">
                     <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: var(--accent-red-glow);">
                         <i data-lucide="map" style="color: var(--accent-red);" class="w-6 h-6"></i>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-bold" style="color: var(--text-primary);">Mapa Local</h2>
-                        <p class="text-xs" style="color: var(--text-muted);">Descarga tu zona para uso offline</p>
+                        <h2 class="text-2xl font-bold" style="color: var(--text-primary);">Mapa Offline</h2>
+                        <p class="text-xs" style="color: var(--text-muted);">Guía para descargar mapas de Google Maps</p>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap gap-2 mb-4">
-                    <button onclick="locateUser()" class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-white font-semibold text-sm transition-all hover:opacity-90 active:scale-95" style="background: var(--accent-blue);">
-                        <i data-lucide="crosshair" class="w-4 h-4"></i> Localizarme
-                    </button>
-                    <button id="btn-gmaps" onclick="openInGoogleMaps()" disabled class="flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all opacity-50 cursor-not-allowed active:scale-95 border" style="background: var(--bg-item); color: var(--text-primary); border-color: var(--border-color);">
-                        <i data-lucide="external-link" class="w-4 h-4"></i> Abrir en Google Maps
-                    </button>
-                </div>
+                <img src="descargarmapa.jpg" alt="Cómo descargar mapas en Google Maps para verlos sin conexión" class="w-full rounded-xl shadow-lg" onerror="this.style.display='none'; document.getElementById('mapa-error').style.display='flex';">
 
-                <div id="map-loader" class="hidden mb-3 flex items-center gap-2" style="color: var(--accent-blue);">
-                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
-                    <span class="text-sm">Cargando mapa...</span>
-                </div>
-                <p id="map-status" class="text-sm mb-3 font-medium" style="color: var(--text-muted);">Pulsa "Localizarme" para obtener tu posición.</p>
-
-                <div class="rounded-2xl overflow-hidden border shadow-lg" style="border-color: var(--border-color);">
-                    <div id="leaflet-map"></div>
-                </div>
-
-                <!-- Mapa descargable desplegable -->
-                <details class="mt-4 rounded-xl border overflow-hidden group" style="background: var(--bg-item); border-color: var(--border-color);">
-                    <summary class="font-semibold flex items-center justify-between p-4 cursor-pointer select-none text-sm" style="color: var(--text-secondary);">
-                        <div class="flex items-center gap-2">
-                            <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--accent-green); opacity: 0.15;">
-                                <i data-lucide="map" class="w-4 h-4" style="color: var(--accent-green);"></i>
-                            </div>
-                            Ver Mapa Descargado (Offline)
-                        </div>
-                        <i data-lucide="chevron-down" class="chevron w-4 h-4" style="color: var(--text-muted);"></i>
-                    </summary>
-                    <div class="p-4 pt-0 border-t" style="border-color: var(--border-color);">
-                        <img src="descargarmapa.jpg" alt="Mapa descargado de tu zona" class="w-full rounded-lg shadow-md" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="hidden flex-col items-center gap-2 py-8" style="color: var(--text-muted);">
-                            <i data-lucide="image-off" class="w-8 h-8"></i>
-                            <span class="text-sm text-center">No se encontró 'descargarmapa.jpg'.<br>Coloca tu imagen de mapa en la misma carpeta.</span>
-                        </div>
-                    </div>
-                </details>
-
-                <div class="mt-4 p-4 rounded-xl border flex items-start gap-3" style="background: var(--bg-item); border-color: var(--border-color);">
-                    <i data-lucide="info" class="w-5 h-5 flex-shrink-0 mt-0.5" style="color: var(--accent-blue);"></i>
-                    <p class="text-xs leading-relaxed" style="color: var(--text-secondary);">
-                        <strong style="color: var(--text-primary);">Consejo:</strong> Descarga un mapa de tu zona desde Google Maps y guárdalo como <code class="px-1.5 py-0.5 rounded text-[10px] font-mono" style="background: var(--bg-body); color: var(--accent-blue);">descargarmapa.jpg</code> en la misma carpeta que esta app. Así podrás consultarlo sin conexión.
-                    </p>
+                <div id="mapa-error" class="hidden flex-col items-center gap-3 py-10" style="color: var(--text-muted);">
+                    <i data-lucide="image-off" class="w-10 h-10"></i>
+                    <span class="text-sm text-center">No se encontró 'descargarmapa.jpg'.<br>Coloca la imagen en la misma carpeta que esta app.</span>
                 </div>
             </div>
         </section>
@@ -1116,74 +1070,6 @@
             }
             setInterval(update, 1000);
             update();
-        }
-
-        // --- MAP LOGIC ---
-        let map = null;
-        let mapMarker = null;
-        let userLat = null;
-        let userLng = null;
-
-        function locateUser() {
-            const statusEl = document.getElementById('map-status');
-            const loader = document.getElementById('map-loader');
-            
-            if (!navigator.geolocation) {
-                statusEl.textContent = "La geolocalización no está soportada en este dispositivo.";
-                statusEl.style.color = 'var(--accent-red)';
-                return;
-            }
-
-            statusEl.textContent = "Obteniendo ubicación...";
-            statusEl.style.color = 'var(--accent-blue)';
-            loader.classList.remove('hidden');
-
-            navigator.geolocation.getCurrentPosition(
-                (pos) => {
-                    userLat = pos.coords.latitude;
-                    userLng = pos.coords.longitude;
-                    initMap(userLat, userLng);
-                    statusEl.textContent = `Ubicación: ${userLat.toFixed(4)}, ${userLng.toFixed(4)}`;
-                    statusEl.style.color = 'var(--accent-green)';
-                    loader.classList.add('hidden');
-                    
-                    document.getElementById('btn-gmaps').disabled = false;
-                    document.getElementById('btn-gmaps').classList.remove('opacity-50', 'cursor-not-allowed');
-                },
-                (err) => {
-                    loader.classList.add('hidden');
-                    statusEl.textContent = "Error al obtener ubicación. Asegúrate de permitir el acceso.";
-                    statusEl.style.color = 'var(--accent-red)';
-                    initMap(40.4168, -3.7038);
-                },
-                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
-            );
-        }
-
-        function initMap(lat, lng) {
-            if (map) {
-                map.setView([lat, lng], 16);
-                if (mapMarker) mapMarker.setLatLng([lat, lng]);
-                else mapMarker = L.marker([lat, lng]).addTo(map);
-                return;
-            }
-
-            map = L.map('leaflet-map', { zoomControl: false }).setView([lat, lng], 16);
-            L.control.zoom({ position: 'bottomright' }).addTo(map);
-
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; OpenStreetMap contributors',
-                maxZoom: 19
-            }).addTo(map);
-
-            mapMarker = L.marker([lat, lng]).addTo(map)
-                .bindPopup("<b>Tu ubicación</b>").openPopup();
-        }
-
-        function openInGoogleMaps() {
-            if (userLat && userLng) {
-                window.open(`https://www.google.com/maps?q=${userLat},${userLng}`, '_blank');
-            }
         }
 
         // --- S.O.S GENERATOR ---
