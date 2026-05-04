@@ -1,45 +1,50 @@
-## 🚨 **Portal de Emergencia Integral (PWA)**
+# 🚨 Documento Descriptivo: Portal de Emergencia Integral
 
-*⚠️ AVISO LEGAL CRÍTICO: Este proyecto es una versión de pruebas en fase de desarrollo. Los protocolos y guías aquí descritos tienen un carácter puramente informativo. Toda la responsabilidad derivada del uso de esta herramienta, así como de la ejecución de cualquier maniobra de primeros auxilios o protocolo de emergencia, recae exclusiva y totalmente sobre el usuario. Consulte siempre con el 112 y con los servicios de emergencia profesionales autorizados.*
+**URL del Proyecto:** [Portal de Emergencia Integral](https://javitron112-debug.github.io/Portal-de-Emergencia-Integral/)  
+**Desarrollador / Organización:** `javitron112-debug`  
+**Entorno de Despliegue:** GitHub Pages  
 
-**📝 Descripción del Proyecto**
+---
 
-El Portal de Emergencia Integral es una Aplicación Web Progresiva (PWA) táctica diseñada para asistir a la población civil en situaciones de emergencia grave o escenarios Grid-Down (caída total de la red eléctrica y de telecomunicaciones).
+## 1. Introducción
+El **Portal de Emergencia Integral** es una herramienta web diseñada para centralizar y facilitar el acceso a información crítica durante situaciones de emergencia. Su propósito es servir como un punto de referencia rápido, intuitivo y accesible para que los usuarios puedan encontrar números de contacto, protocolos de actuación y recursos vitales en momentos de crisis.
 
-Su arquitectura está construida bajo una filosofía estrictamente Offline-First. Una vez instalada, la aplicación no requiere conexión a Internet ni acceso a servidores externos, garantizando que las herramientas y protocolos vitales estén siempre disponibles en el dispositivo del usuario en el peor de los escenarios.
+## 2. Objetivos del Proyecto
+* **Centralización:** Agrupar en un solo lugar los recursos necesarios para distintos tipos de emergencias (médicas, incendios, desastres naturales, seguridad).
+* **Accesibilidad y Rapidez:** Proveer una interfaz limpia y optimizada para que cualquier persona, bajo estrés, pueda encontrar lo que necesita en cuestión de segundos.
+* **Disponibilidad:** Al estar desplegada en GitHub Pages, garantiza alta disponibilidad y tiempos de carga rápidos.
 
-**🛠️ Utilidad y Módulos Principales**
+## 3. Funcionalidades Principales
+*(Nota: Estas son las características típicas inferidas para este tipo de portal)*
 
-La herramienta se estructura en cuatro pilares fundamentales de supervivencia y asistencia operativa:
+* 📞 **Directorio de Contactos de Emergencia:** Botones de llamada rápida a la Policía, Bomberos, Ambulancias y Protección Civil.
+* 📋 **Protocolos de Actuación:** Guías paso a paso sobre qué hacer en caso de sismos, incendios, primeros auxilios o emergencias médicas.
+* 📍 **Geolocalización / Mapa (Si aplica):** Ubicación de refugios cercanos, hospitales y puntos de encuentro.
+* 📱 **Diseño Responsive:** Adaptación total a dispositivos móviles (smartphones y tablets), ya que las emergencias suelen consultarse desde estos dispositivos.
 
-1. 🎒 Mochila de 72 Horas
+## 4. Arquitectura y Tecnologías
+Al tratarse de un sitio alojado en el dominio `.github.io`, el proyecto se apoya principalmente en tecnologías de Frontend:
 
-Sistema de auditoría para preparar el equipo de evacuación o aislamiento.
+* **HTML5:** Estructura semántica del contenido, optimizada para accesibilidad.
+* **CSS3 (y frameworks como Bootstrap/Tailwind):** Estilización de la interfaz de usuario para hacerla atractiva y fácil de leer.
+* **JavaScript (Vanilla o frameworks ligeros):** Lógica de interactividad, animaciones y posibles integraciones con APIs (como mapas de Google o Leaflet).
+* **Git & GitHub:** Control de versiones e integración/despliegue continuo (CI/CD) automatizado a través de GitHub Actions o el sistema nativo de Pages.
 
-Características: Checklist interactivo categorizado (Hidratación, Alimentación, Iluminación, Botiquín, etc.). Cuenta con persistencia de datos local (el progreso no se pierde al cerrar la app) e infografías de referencia visual rápida.
+## 5. Estructura de Navegación (Ejemplo)
+1. **Inicio (Home):** Resumen de botones de alerta y números más críticos.
+2. **Contactos:** Lista detallada de entidades gubernamentales y de apoyo.
+3. **Guías de Supervivencia / Primeros Auxilios:** Documentación de prevención y reacción rápida.
+4. **Acerca del Portal:** Información sobre el propósito de la página y el desarrollador.
 
-2. 📻 Protocolo Plan 333 (Comunicaciones)
+## 6. Posibles Mejoras a Futuro
+* **Modo Offline:** Implementación de Service Workers (PWA) para que el portal se pueda consultar incluso sin conexión a internet.
+* **Soporte Multilenguaje:** Traducción a diferentes idiomas para ser de utilidad a turistas o residentes extranjeros.
+* **Integración de Alertas en Tiempo Real:** Consumo de APIs gubernamentales o meteorológicas para mostrar avisos de riesgo (clima extremo, alertas sísmicas).
 
-Estandarización de comunicaciones por radio para priorizar el ahorro crítico de batería.
+---
 
-Características: Cronómetro inteligente que calcula las ventanas operativas (Canal 3, cada 3 horas, durante 3 minutos). Incluye tablas de frecuencias de uso libre (PMR446) y Banda Ciudadana (CB-27), además de directrices de disciplina de radio.
+*Documento generado para fines descriptivos y de presentación del repositorio de GitHub.*
+```
 
-3. 🩹 Protocolos de Auxilio
-
-Guías de intervención rápida y directa para emergencias médicas de riesgo vital por parte de personal no sanitario.
-
-Características: Algoritmo P.A.S. (Proteger, Avisar, Socorrer), evaluación de consciencia y respiración, soporte vital básico (RCP) y desobstrucción de vía aérea (Heimlich) con infografías divididas por edad (Adultos, Niños, Bebés). Incluye protocolo de control de hemorragias masivas.
-
-4. 🆘 Baliza S.O.S
-
-Herramienta de último recurso para facilitar la localización y el rescate del usuario.
-
-Características: Integra una señal lumínica estroboscópica (patrón Morse), una alarma acústica penetrante (onda cuadrada a 800 Hz) y un disparador táctico que redacta un SMS automático con la ubicación GPS exacta hacia un número de contacto predefinido.
-
-**⚙️ Arquitectura Técnica**
-
-100% Autónoma: Todo el diseño y la lógica (HTML, Tailwind CSS, JS) reside en un único archivo de ejecución. Cero dependencias externas en tiempo de ejecución.
-
-PWA Instalable: Utiliza un manifest.json y un Service Worker (sw.js) a prueba de fallos para instalarse en el escritorio de dispositivos Android, iOS y sistemas de escritorio.
-
-Privacidad y Seguridad: La aplicación no utiliza bases de datos en la nube ni telemetría. Toda la configuración del usuario se almacena localmente mediante localStorage.
+### ¿Cómo adaptar este documento?
+Si tu página tiene apartados diferentes (por ejemplo, un panel de administración, una base de datos Firebase, un login para rescatistas, etc.), **dime qué secciones o tecnologías exactas tienes en la web**, o pégame el código del `index.html` / el archivo `README.md`, y con gusto redactaré la documentación precisa al 100%.
