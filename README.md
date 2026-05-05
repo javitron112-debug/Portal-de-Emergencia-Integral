@@ -42,9 +42,3 @@ Al tratarse de un sitio alojado en el dominio `.github.io`, el proyecto se apoya
 * **Integración de Alertas en Tiempo Real:** Consumo de APIs gubernamentales o meteorológicas para mostrar avisos de riesgo (clima extremo, alertas sísmicas).
 
 ---
-
-*Documento generado para fines descriptivos y de presentación del repositorio de GitHub.*
-```
-
-### ¿Cómo adaptar este documento?
-Si tu página tiene apartados diferentes (por ejemplo, un panel de administración, una base de datos Firebase, un login para rescatistas, etc.), **dime qué secciones o tecnologías exactas tienes en la web**, o pégame el código del `index.html` / el archivo `README.md`, y con gusto redactaré la documentación precisa al 100%.
